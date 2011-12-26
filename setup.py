@@ -23,6 +23,7 @@ setup(
     install_requires=[
         'sqlalchemy==0.7.4',
         'Flask==0.8', 
+        'Flask-Script==0.3.1',
         'flask-sqlalchemy==0.15',
         'sqlalchemy-migrate==0.7.2'
     ],
