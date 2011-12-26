@@ -1,9 +1,9 @@
-Grano - open source social network web analysis
-===============================================
+Grano - open source social network analysis web platform
+========================================================
 
-Grano is an engine for running social network discovery and analysis 
-sites. Such sites can be used in efforts to determine actor relations
-in any number of domains, such as politics, business or crime.
+Grano is an engine for running social network analysis sites. Instances can
+be used in efforts to determine actor relations in any number of domains,
+such as politics, business or crime.
 
 
 
