@@ -63,10 +63,12 @@ relations. A resource layout could look like this:
 * ``/api/1/net/<network>/entity`` - collection of entities in a
   specified network. Can be paginated through with ``GET``, new entities
   can be created with ``POST`` and bulk updates performed with ``PUT``.
+* ``/api/1/net/<network>/entity/types`` - available types information.
 * ``/api/1/net/<network>/entity/<id>`` - entity ``id``, supports
   ``GET`` and ``PUT``. This may or may not include the adjacency list,
   which may also be stored in its own sub-resource (e.g.
   ``.../relations``, or ``.../incoming``; ``.../outgoing``).
+* ``/api/1/net/<network>/rel/types`` - available types information.
 * ``/api/1/net/<network>/rel/<id>`` - relation ``id``, ``PUT`` and 
   ``GET``.
 
