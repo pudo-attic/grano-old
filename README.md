@@ -57,19 +57,20 @@ API
 The graph API must enable read/write operations on both entites and 
 relations. A resource layout could look like this:
 
-* ``/api/1/net`` - network (i.e. tenant of the system), listing via
+* ``/api/1/types/entity`` - allow users to see metadata on registered
+  entity types. Only ``GET``. Detailed view required?
+* ``/api/1/types/relation`` - same for relations.
+* ``/api/1/networks`` - network (i.e. tenant of the system), listing via
   ``GET`` and creation via ``POST``. Deletion probably not required.
-* ``/api/1/net/<network>`` - network instance, ``GET`` and ``PUT``. 
-* ``/api/1/net/<network>/entity`` - collection of entities in a
+* ``/api/1/<network>`` - network instance, ``GET`` and ``PUT``. 
+* ``/api/1/<network>/entity`` - collection of entities in a
   specified network. Can be paginated through with ``GET``, new entities
   can be created with ``POST`` and bulk updates performed with ``PUT``.
-* ``/api/1/net/<network>/entity/types`` - available types information.
-* ``/api/1/net/<network>/entity/<id>`` - entity ``id``, supports
+* ``/api/1/<network>/entity/<id>`` - entity ``id``, supports
   ``GET`` and ``PUT``. This may or may not include the adjacency list,
   which may also be stored in its own sub-resource (e.g.
   ``.../relations``, or ``.../incoming``; ``.../outgoing``).
-* ``/api/1/net/<network>/rel/types`` - available types information.
-* ``/api/1/net/<network>/rel/<id>`` - relation ``id``, ``PUT`` and 
+* ``/api/1/<network>/rel/<id>`` - relation ``id``, ``PUT`` and 
   ``GET``.
 
 Open questions:
