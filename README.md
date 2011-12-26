@@ -121,3 +121,28 @@ Relation (edge) representation::
     }
 
 
+Domain Model
+------------
+
+
+Questions: 
+
+* Are schema types for entities and relations per-network or global?
+* Are schema types regenerated at run-time?
+* Is the graph name spaced by network?
+* Are slugs constant?
+
+
+Links, References and Prior Art
+-------------------------------
+
+* [LittleSis](http://littlesis.org/)
+* [Influcence Networks](http://app.owni.fr/influence-networks/)
+* [Blog post](http://pudo.org/2011/12/19/sna.html) lining out some
+  rationale for this.
+* [NetworkX](http://networkx.lanl.gov/) - python library.
+* [Strength of Weak Ties](http://sociology.stanford.edu/people/mgranovetter/documents/granstrengthweakties.pdf), to explain the name ;)
+
+
+
+
