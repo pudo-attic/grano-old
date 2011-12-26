@@ -77,6 +77,45 @@ Open questions:
 * Is ``/api/1/net/<network>/rel`` a proper resource (i.e. the full 
   adjacency list)?
 
+Entity (node) representation::
 
+    {
+      "id": 483,
+      "current": true,
+      "serial": 201201010,
+      "created_at": 2012-01-01 01:01:01.1111,
+      "slug": "dngela-merkel",
+      "title": "Dr. Angela Merkel",
+      "tagline": "Chancellor of the Federal Republic of Germany",
+      "description": "....",
+      "type": "person",
+      /* Type-specific schema: */
+      "birth_date": ...,
+      "death_date": null,
+      "place_of_birth": "Osten"
+    }
+
+Relation (edge) representation::
+
+    {
+      "id": 944847527,
+      "current": true,
+      "serial": 20121212235911,
+      "created_at": 2012-12-12 23:59:11.0000,
+      "type": "owner_of",
+      "source": {
+          "id": 3883,
+          "uri": "/api/1/net/foo/entity/3883",
+          "title": "Some person",
+          "type": "person"
+        },
+      "target": {
+          "id": 4,
+          "uri": "/api/1/net/foo/entity/4"
+          "title": "Cool Jetboat",
+          "type": "asset"
+        },
+      "acquisition_date": null
+    }
 
 
