@@ -25,6 +25,7 @@ setup(
         'Flask==0.8', 
         'Flask-Script==0.3.1',
         'flask-sqlalchemy==0.15',
+        'colander=0.9.4',
         'sqlalchemy-migrate==0.7.2'
     ],
     tests_require=[],
