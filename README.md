@@ -35,7 +35,7 @@ Random decisions:
 * Schema changes at run time?
 
 Storage Mechanism
-'''''''''''''''''
+-----------------
 
 Options: 
 
@@ -52,7 +52,7 @@ Options:
 
 
 API
-'''
+---
 
 The graph API must enable read/write operations on both entites and 
 relations. A resource layout could look like this:
