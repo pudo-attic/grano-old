@@ -1,0 +1,22 @@
+
+Entity/Relation Spec Schema
+===========================
+
+What's required?
+
+* Type name and label
+* Type description
+* List of attributes, each with a name, type, help and description.
+
+
+Attribute Types:
+  * string
+  * integer
+  * float
+  * datetime
+  
+  Later on:
+    lists: list of primitives, list of objects
+    sub-dicts (i.e. JSON data)
+
+
