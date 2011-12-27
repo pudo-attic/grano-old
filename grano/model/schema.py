@@ -36,6 +36,10 @@ class Schema(object):
     def cls(self):
         if self._cls is None:
             self._cls = self._make_cls()
+            table = self._cls.__table__
+            table.metadata.bind = db.engine
+            if not table.exists():
+                table.create()
         return self._cls
 
     def _make_cls(self):
