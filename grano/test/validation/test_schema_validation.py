@@ -74,6 +74,3 @@ class TestSchemaValidation(unittest.TestCase):
         schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
         base = apply_schema(base, schema)
         assert len(base.children)==len(h.TEST_ENTITY_SCHEMA['attributes'])
-        dd = base.children[0]
-        assert dd.typ==DateTime
-        assert dd.name=='death_day'

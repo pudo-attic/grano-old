@@ -58,6 +58,6 @@ def apply_schema(base, schema):
     for attribute in schema.attributes:
         validator = ATTRIBUTE_VALIDATORS[attribute.type]
         # TODO: does this need to support `missing` and `empty`.
-        base.add(_node(validator, attribute.name))
+        base.add(_node(validator(), attribute.name))
     return base
 
