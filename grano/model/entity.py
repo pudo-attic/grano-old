@@ -34,6 +34,20 @@ class Entity(db.Model):
     network = db.relationship('Network',
         backref=db.backref('all_entities', lazy='dynamic'))
     
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'serial': self.serial,
+            'type': self.type,
+            'current': self.current,
+            'slug': self.slug,
+            'title': self.title,
+            'created_at': self.created_at,
+            'summary': self.summary,
+            'description': self.description,
+            'network': self.network.slug
+            }
+
     def __repr__(self):
         return "<Entity:%s(%s,%s)>" % (self.type, self.id, self.slug)
 

@@ -7,8 +7,11 @@ ATTRIBUTE_TYPES_DB = {
     'date': db.DateTime
     }
 
-class SchemaSet(object):
-    pass
+class SchemaSet(dict):
+    
+    def add(self, schema):
+        self[schema.name] = schema
+
 
 class Schema(object):
     """ A schema defines a specific subtype of either an entity or a relation.
@@ -62,6 +65,16 @@ class Schema(object):
         # set up the specific attributes:
         for attribute in self.attributes:
             cls[attribute.name] = db.Column(attribute.column_type)
+
+        # make an as_dict method:
+        def as_dict(ins):
+            d = self.parent_cls.as_dict(ins)
+            for attribute in self.attributes:
+                d[attribute.name] = \
+                    getattr(ins, attribute.name)
+            return d
+        cls['as_dict'] = as_dict
+
         return type(self.name, (self.parent_cls,), cls)
 
 

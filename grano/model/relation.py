@@ -21,6 +21,24 @@ class Relation(db.Model):
     network = db.relationship('Network',
         backref=db.backref('all_relations', lazy='dynamic'))
     
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'serial': self.serial,
+            'type': self.type,
+            'current': self.current,
+            'created_at': self.created_at,
+            'network': self.network.slug,
+            'source': {
+                'id': self.source.id,
+                'slug': self.source.slug
+                },
+            'target': {
+                'id': self.target.id,
+                'slug': self.target.slug
+                }
+            }
+
     def __repr__(self):
         return "<Relation:%s(%s,%s,%s)>" % (self.type, self.id,
                 self.source_id, self.target_id)

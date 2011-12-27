@@ -17,10 +17,24 @@ class Network(db.Model):
     @property
     def entities(self):
         return self.all_entities.filter_by(current=True)
-    
+
     @property
     def relations(self):
         return self.all_relations.filter_by(current=True)
 
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'slug': self.slug,
+            'title': self.title,
+            'description': self.description,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'num_entities': self.entities.count(),
+            'num_relations': self.relations.count(),
+            }
+
     def __repr__(self):
         return "<Network(%s,%s)>" % (self.id, self.slug)
+
+
