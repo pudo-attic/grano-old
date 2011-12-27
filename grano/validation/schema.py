@@ -10,6 +10,7 @@ INVALID_NAMES = ['id', 'current', 'serial', 'title',
     'created_at']
 
 def attribute_schema(name):
+    """ Validate the representation of a schema attribute. """
     schema = mapping(name, validator=chained(
         name_wrap(nonempty_string, name),
         name_wrap(reserved_name(INVALID_NAMES), name),
@@ -23,6 +24,9 @@ def attribute_schema(name):
     return schema
 
 def validate_schema(data):
+    """ Validate a schema. This does not actually apply the 
+    schema to user data but checks for the integrity of its 
+    specification. """
     schema = mapping('schema')
     schema.add(key('name', validator=chained(
             nonempty_string,
@@ -36,8 +40,6 @@ def validate_schema(data):
     for attribute in data.get('attributes', {}):
         attributes.add(attribute_schema(attribute))
     schema.add(attributes)
-    from pprint import pprint 
-    pprint(data)
     return schema.deserialize(data)
 
 
