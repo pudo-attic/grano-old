@@ -13,8 +13,8 @@ def _node(schema, name, *children, **kw):
                       **kw)
 
 
-def mapping(name, **kw):
-    return _node(Mapping(unknown='preserve'),
+def mapping(name, unknown='preserve', **kw):
+    return _node(Mapping(unknown=unknown),
                  name=name, **kw)
 
 
