@@ -2,12 +2,14 @@ import unittest
 from pprint import pprint
 from copy import deepcopy
 
-from colander import Invalid
+from colander import Invalid, DateTime
 
+from grano.model import Entity, Schema
 from grano.test import helpers as h
 
 from grano.test.model.test_schema import TEST_ENTITY_SCHEMA
-from grano.validation.schema import validate_schema
+from grano.validation.schema import validate_schema, apply_schema
+from grano.validation.util import mapping
 
 class TestSchemaValidation(unittest.TestCase):
 
@@ -67,3 +69,12 @@ class TestSchemaValidation(unittest.TestCase):
         in_ = deepcopy(TEST_ENTITY_SCHEMA)
         in_['attributes']['birth_day']['type'] = 'foo'
         validate_schema(in_)
+
+    def test_apply_schema(self):
+        base = mapping('entity')
+        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
+        base = apply_schema(base, schema)
+        assert len(base.children)==len(TEST_ENTITY_SCHEMA['attributes'])
+        dd = base.children[0]
+        assert dd.typ==DateTime
+        assert dd.name=='death_day'
