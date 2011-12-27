@@ -29,14 +29,8 @@ class Relation(db.Model):
             'current': self.current,
             'created_at': self.created_at,
             'network': self.network.slug,
-            'source': {
-                'id': self.source.id,
-                'slug': self.source.slug
-                },
-            'target': {
-                'id': self.target.id,
-                'slug': self.target.slug
-                }
+            'source': self.source_id,
+            'target': self.target_id
             }
 
     def __repr__(self):

@@ -5,7 +5,7 @@ from nose.tools import *
 from nose.plugins.skip import SkipTest
 
 TEST_ENTITY_SCHEMA = {
-    'name': 'Person',
+    'name': 'person',
     'label': 'Person',
     'attributes': {
         'birth_day': {
