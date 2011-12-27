@@ -45,3 +45,9 @@ class TestEntity(unittest.TestCase):
         assert obj2.title=='New Man', obj
         assert obj.id==obj2.id, (obj.id, obj2.id)
         assert obj.serial!=obj2.serial, (obj.serial)
+
+        res = self.schema.cls.current_by_id(obj.id)
+        assert res.serial==obj2.serial, res
+
+        all_ = self.schema.cls.all().count()
+        assert all_==1, all_

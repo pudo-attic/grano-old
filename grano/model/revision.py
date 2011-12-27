@@ -47,3 +47,19 @@ class RevisionedMixIn(object):
 
     def update_values(self, schema, data):
         raise TypeError()
+
+    @classmethod
+    def current_by_id(cls, id):
+        q = db.session.query(cls)
+        q = q.filter_by(current=True)
+        q = q.filter_by(id=id)
+        return q.first()
+
+    @classmethod
+    def all(cls):
+        q = db.session.query(cls)
+        q = q.filter_by(current=True)
+        return q
+
+
+
