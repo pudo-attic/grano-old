@@ -2,8 +2,9 @@ from datetime import datetime
 
 from grano.core import db
 from grano.model import util
+from grano.model.revision import RevisionedMixIn
 
-class Relation(db.Model):
+class Relation(db.Model, RevisionedMixIn):
     __tablename__ = 'relation'
     id = db.Column(db.String(36), primary_key=True, default=util.make_id)
     serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)

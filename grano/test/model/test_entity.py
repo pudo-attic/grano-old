@@ -11,6 +11,7 @@ class TestEntity(unittest.TestCase):
         self.network = Network()
         self.network.title = 'Net'
         self.network.slug = 'net'
+        self.schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
         self.client = h.make_test_app()
 
     def tearDown(self):
@@ -23,8 +24,7 @@ class TestEntity(unittest.TestCase):
         assert entity.as_dict()['title']=='Foo'
 
     def test_entity_schema(self):
-        schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
-        obj = schema.cls()
+        obj = self.schema.cls()
         obj.birth_place = 'Utopia'
         obj.title = 'The Man'
         obj.slug = 'the-man'
@@ -33,4 +33,15 @@ class TestEntity(unittest.TestCase):
         assert obj.id!=None
         assert obj.serial!=None
 
-
+    def test_entity_create_versioned(self):
+        obj = Entity.create(self.schema, {'title': 'The Man'})
+        assert obj.title=='The Man', obj
+        assert obj.slug=='the-man', obj
+    
+    def test_entity_update_versioned(self):
+        obj = Entity.create(self.schema, {'title': 'The Man'})
+        obj2 = obj.update(self.schema, {'title': 'New Man'})
+        assert obj.title=='The Man', obj
+        assert obj2.title=='New Man', obj
+        assert obj.id==obj2.id, (obj.id, obj2.id)
+        assert obj.serial!=obj2.serial, (obj.serial)

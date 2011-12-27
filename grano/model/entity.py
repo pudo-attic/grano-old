@@ -2,8 +2,9 @@ from datetime import datetime
 
 from grano.core import db
 from grano.model import util
+from grano.model.revision import RevisionedMixIn
 
-class Entity(db.Model):
+class Entity(db.Model, RevisionedMixIn):
     __tablename__ = 'entity'
     id = db.Column(db.String(36), primary_key=True, default=util.make_id)
     serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
@@ -34,6 +35,10 @@ class Entity(db.Model):
     network = db.relationship('Network',
         backref=db.backref('all_entities', lazy='dynamic'))
     
+    def update_values(self, schema, data):
+        self.title = data.get('title')
+        self.slug = util.slugify(self.title)
+
     def as_dict(self):
         return {
             'id': self.id,
@@ -45,7 +50,7 @@ class Entity(db.Model):
             'created_at': self.created_at,
             'summary': self.summary,
             'description': self.description,
-            'network': self.network.slug
+            'network': self.network.slug if self.network else None
             }
 
     def __repr__(self):
