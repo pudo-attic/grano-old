@@ -1,12 +1,43 @@
+from grano.validation.util import mapping, key, chained, in_
+from grano.validation.util import name_wrap, nonempty_string
+from grano.validation.util import reserved_name, database_name
 
-# placeholder
+from grano.model.schema import ATTRIBUTE_TYPES_DB
 
-INVALID_ATTRIBUTE_NAMES = ['id', 'current', 'serial', 'title', 'slug',
-    'type', 'incoming', 'outgoing', 'target', 'source', 'target_id',
-    'source_id', 'network', 'network_id', 'created_at']
+INVALID_NAMES = ['id', 'current', 'serial', 'title', 
+    'slug', 'type', 'incoming', 'outgoing', 'target', 'source', 
+    'target_id', 'source_id', 'network', 'network_id', 
+    'created_at']
 
+def attribute_schema(name):
+    schema = mapping(name, validator=chained(
+        name_wrap(nonempty_string, name),
+        name_wrap(reserved_name(INVALID_NAMES), name),
+        name_wrap(database_name, name)
+        ))
+    schema.add(key('label', validator=nonempty_string))
+    schema.add(key('type', validator=chained(
+            nonempty_string,
+            in_(ATTRIBUTE_TYPES_DB)
+        )))
+    return schema
 
 def validate_schema(data):
-    return data
+    schema = mapping('schema')
+    schema.add(key('name', validator=chained(
+            nonempty_string,
+            reserved_name(INVALID_NAMES),
+            database_name,
+        )))
+    schema.add(key('label', validator=chained(
+            nonempty_string,
+        )))
+    attributes = mapping('attributes')
+    for attribute in data.get('attributes', {}):
+        attributes.add(attribute_schema(attribute))
+    schema.add(attributes)
+    from pprint import pprint 
+    pprint(data)
+    return schema.deserialize(data)
 
 

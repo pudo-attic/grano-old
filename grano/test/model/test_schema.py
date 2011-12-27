@@ -36,7 +36,7 @@ class TestSchema(unittest.TestCase):
         helpers.tear_down_test_app()
 
     def test_basic_schema(self):
-        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
+        schema = Schema(Entity, TEST_ENTITY_SCHEMA.copy())
         assert schema.name==TEST_ENTITY_SCHEMA['name']
         assert schema.label==TEST_ENTITY_SCHEMA['label']
         assert len(schema.attributes)==3, schema.attributes
