@@ -6,4 +6,7 @@ INVALID_ATTRIBUTE_NAMES = ['id', 'current', 'serial', 'title', 'slug',
     'source_id', 'network', 'network_id', 'created_at']
 
 
+def validate_schema(data):
+    return data
+
 

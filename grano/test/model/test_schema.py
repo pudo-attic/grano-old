@@ -1,10 +1,10 @@
 import unittest
 from grano.core import db
 from grano.test import helpers
-from grano.model.schema import Schema, Attribute
+from grano.model.schema import Schema
 from grano.model.entity import Entity
 
-TEST_SCHEMA = {
+TEST_ENTITY_SCHEMA = {
     'name': 'person2',
     'label': 'Person',
     'attributes': {
@@ -36,19 +36,19 @@ class TestSchema(unittest.TestCase):
         helpers.tear_down_test_app()
 
     def test_basic_schema(self):
-        schema = Schema(Entity, TEST_SCHEMA)
-        assert schema.name==TEST_SCHEMA['name']
-        assert schema.label==TEST_SCHEMA['label']
+        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
+        assert schema.name==TEST_ENTITY_SCHEMA['name']
+        assert schema.label==TEST_ENTITY_SCHEMA['label']
         assert len(schema.attributes)==3, schema.attributes
     
     def test_attribute(self):
-        schema = Schema(Entity, TEST_SCHEMA)
+        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
         attr = schema.attributes[1]
         assert attr.name=='birth_day', attr.name
         assert attr.column_type==db.DateTime
 
     def test_generate_type(self):
-        schema = Schema(Entity, TEST_SCHEMA)
+        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
         cls = schema.cls
         assert hasattr(cls, 'id')
         assert hasattr(cls, 'serial')
