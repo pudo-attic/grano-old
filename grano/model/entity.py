@@ -26,15 +26,14 @@ class Entity(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     slug = db.Column(db.Unicode)
     title = db.Column(db.Unicode)
+    
+    summary = db.Column(db.Unicode)
+    description = db.Column(db.Unicode)
 
+    network_id = db.Column(db.Integer, db.ForeignKey('network.id'))
+    network = db.relationship('Network',
+        backref=db.backref('all_entities', lazy='dynamic'))
+    
+    def __repr__(self):
+        return "<Entity:%s(%s,%s)>" % (self.type, self.id, self.slug)
 
-class Person(Entity):
-    __tablename__ = 'entity_person'
-    id = db.Column(db.String(36), db.ForeignKey('entity.id'), primary_key=True)
-    serial = db.Column(db.Integer, db.ForeignKey('entity.serial'), primary_key=True)
-    __mapper_args__ = {
-            'polymorphic_identity': 'person',
-            'inherit_condition': db.and_(id==Entity.id, serial==Entity.serial)
-            }
-
-    birth_place = db.Column(db.Unicode)
