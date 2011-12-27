@@ -5,6 +5,8 @@ from grano.model import util
 from grano.model.revision import RevisionedMixIn
 
 class Entity(db.Model, RevisionedMixIn):
+    """ Node type, never really instantiated directly. """
+
     __tablename__ = 'entity'
     id = db.Column(db.String(36), primary_key=True, default=util.make_id)
     serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
@@ -38,6 +40,9 @@ class Entity(db.Model, RevisionedMixIn):
     def update_values(self, schema, data):
         self.title = data.get('title')
         self.slug = util.slugify(self.title)
+        self.summary = data.get('summary')
+        self.description = data.get('description')
+        # TODO: network.
 
     def as_dict(self):
         return {

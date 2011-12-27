@@ -34,6 +34,18 @@ class Network(db.Model):
             'num_relations': self.relations.count(),
             }
 
+    @classmethod
+    def by_id(self, id):
+        q = db.session.query(Network)
+        q = q.filter_by(id=id)
+        return q.first()
+
+    @classmethod
+    def by_slug(self, slug):
+        q = db.session.query(Network)
+        q = q.filter_by(slug=slug)
+        return q.first()
+
     def __repr__(self):
         return "<Network(%s,%s)>" % (self.id, self.slug)
 

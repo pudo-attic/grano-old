@@ -5,6 +5,9 @@ from grano.model import util
 from grano.model.revision import RevisionedMixIn
 
 class Relation(db.Model, RevisionedMixIn):
+    """ Edge data type. This is never instantiated directly, only through a 
+    schema definition which will create a joined subtype. """
+
     __tablename__ = 'relation'
     id = db.Column(db.String(36), primary_key=True, default=util.make_id)
     serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
@@ -22,6 +25,12 @@ class Relation(db.Model, RevisionedMixIn):
     network = db.relationship('Network',
         backref=db.backref('all_relations', lazy='dynamic'))
     
+    def update_values(self, schema, data):
+        # TODO: source
+        # TODO: target
+        # TODO: network
+        pass
+
     def as_dict(self):
         return {
             'id': self.id,
