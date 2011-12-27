@@ -1,54 +1,32 @@
 import unittest
 from grano.core import db
-from grano.test import helpers
+from grano.test import helpers as h
 from grano.model.schema import Schema
 from grano.model.entity import Entity
-
-TEST_ENTITY_SCHEMA = {
-    'name': 'person2',
-    'label': 'Person',
-    'attributes': {
-        'birth_day': {
-            'type': 'date',
-            'label': 'Birth Day',
-            'help': 'The person\'s birth day.'
-            },
-        'death_day': {
-            'type': 'date',
-            'label': 'Death Day',
-            'help': 'The day the person died.'
-            },
-        'birth_place': {
-            'type': 'string',
-            'label': 'Birth Place',
-            'help': 'The place of birth.'
-            }
-        }
-    }
 
 
 class TestSchema(unittest.TestCase):
 
     def setUp(self):
-        self.client = helpers.make_test_app()
+        self.client = h.make_test_app()
 
     def tearDown(self):
-        helpers.tear_down_test_app()
+        h.tear_down_test_app()
 
     def test_basic_schema(self):
-        schema = Schema(Entity, TEST_ENTITY_SCHEMA.copy())
-        assert schema.name==TEST_ENTITY_SCHEMA['name']
-        assert schema.label==TEST_ENTITY_SCHEMA['label']
+        schema = Schema(Entity, h.TEST_ENTITY_SCHEMA.copy())
+        assert schema.name==h.TEST_ENTITY_SCHEMA['name']
+        assert schema.label==h.TEST_ENTITY_SCHEMA['label']
         assert len(schema.attributes)==3, schema.attributes
     
     def test_attribute(self):
-        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
+        schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
         attr = schema.attributes[1]
         assert attr.name=='birth_day', attr.name
         assert attr.column_type==db.DateTime
 
     def test_generate_type(self):
-        schema = Schema(Entity, TEST_ENTITY_SCHEMA)
+        schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
         cls = schema.cls
         assert hasattr(cls, 'id')
         assert hasattr(cls, 'serial')
