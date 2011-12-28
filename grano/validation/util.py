@@ -2,6 +2,7 @@ import re
 
 from colander import SchemaNode, Function, String
 from colander import Mapping, Sequence
+from colander import SchemaType, Invalid
 
 
 def _node(schema, name, *children, **kw):

@@ -1,9 +1,9 @@
-from grano.validation.util import mapping, key, chained
+from grano.validation.util import mapping, key, chained, _node
 from grano.validation.util import nonempty_string, in_
-
+from grano.validation.types import NetworkSchemaType
 from grano.validation.schema import apply_schema
 
-def validate_entity(data, schema):
+def validate_entity(data, schema, context):
     entity = mapping('entity')
     entity.add(key('title', validator=chained(
             nonempty_string
@@ -12,9 +12,9 @@ def validate_entity(data, schema):
             nonempty_string,
             in_([schema.name])
         )))
-    # TODO: valid network
-    # TODO: summary
-    # TODO: description
+    entity.add(key('summary', missing=None))
+    entity.add(key('description', missing=None))
+    entity.add(_node(NetworkSchemaType(context), 'network'))
     entity = apply_schema(entity, schema)
     return entity.deserialize(data)
 
