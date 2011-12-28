@@ -13,6 +13,7 @@ class Network(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     @property
     def entities(self):
@@ -38,13 +39,21 @@ class Network(db.Model):
     def by_id(self, id):
         q = db.session.query(Network)
         q = q.filter_by(id=id)
+        q = q.filter_by(deleted_at=None)
         return q.first()
 
     @classmethod
     def by_slug(self, slug):
         q = db.session.query(Network)
         q = q.filter_by(slug=slug)
+        q = q.filter_by(deleted_at=None)
         return q.first()
+
+    @classmethod
+    def all(self):
+        q = db.session.query(Network)
+        q = q.filter_by(deleted_at=None)
+        return q
 
     def __repr__(self):
         return "<Network(%s,%s)>" % (self.id, self.slug)
