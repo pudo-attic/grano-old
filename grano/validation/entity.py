@@ -1,5 +1,3 @@
-import colander
-
 from grano.validation.util import mapping, key, chained
 from grano.validation.util import nonempty_string, in_
 

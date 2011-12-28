@@ -26,6 +26,17 @@ TEST_ENTITY_SCHEMA = {
         }
     }
 
+TEST_RELATION_SCHEMA = {
+    'name': 'social',
+    'label': 'Social Connection',
+    'attributes': {
+        'link_type': {
+            'type': 'string',
+            'label': 'Link Type',
+            }
+        }
+    }
+
 def skip(*args, **kwargs):
     raise SkipTest(*args, **kwargs)
 

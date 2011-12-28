@@ -91,7 +91,7 @@ class Attribute(object):
         self.name = name
         self.type = data['type']
         self.label = data['label']
-        self.help = data['help']
+        self.help = data.get('help')
 
     @property
     def column_type(self):
