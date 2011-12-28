@@ -13,7 +13,7 @@ class Network(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
-    deleted_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    deleted_at = db.Column(db.DateTime)
 
     @property
     def entities(self):
@@ -22,6 +22,22 @@ class Network(db.Model):
     @property
     def relations(self):
         return self.all_relations.filter_by(current=True)
+    
+    @classmethod
+    def create(cls, data):
+        obj = cls()
+        obj.update(data)
+        return obj
+
+    def update(self, data):
+        self.title = data.get('title')
+        self.slug = data.get('slug')
+        self.description = data.get('description')
+        db.session.add(self)
+        db.session.flush()
+
+    def delete(self):
+        self.deleted_at = datetime.utcnow()
 
     def as_dict(self):
         return {

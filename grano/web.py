@@ -26,9 +26,9 @@ def handle_validation_error(exc):
     if 'json' == response_format(app, request):
         body = {'status': 400,
                 'description': unicode(exc),
-                'errors': exc.as_dict()}
+                'errors': exc.asdict()}
         return jsonify(body, status=400)
-    return Response(repr(exc.unpack_errors()), status=400, 
+    return Response(repr(exc.asdict()), status=400, 
                     mimetype='text/plain')
 
 
