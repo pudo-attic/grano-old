@@ -1,10 +1,6 @@
 import unittest
 import json
 
-from grano import core
-from grano import model
-from grano import web
-
 NETWORK_FIXTURE = {'title': 'The One Percent', 
                    'description': 'A very neat resource!'}
 
@@ -43,17 +39,16 @@ class NetworkAPITestCase(unittest.TestCase):
                       follow_redirects=True)
         body = json.loads(res.data)
         assert body['title']==data['title'], body
-    
+
     def test_network_create_invalid(self):
         data = {'description': 'no'}
         res = self.app.post('/api/1/networks', data=data,
                       follow_redirects=True)
         assert res.status_code==400,res.status_code
-    
+
     def test_network_delete_nonexistent(self):
         res = self.app.delete('/api/1/networks/the-one')
         assert res.status_code==404,res.status_code
-
 
     def test_network_delete(self):
         res = self.app.delete('/api/1/networks/the-one-percent')

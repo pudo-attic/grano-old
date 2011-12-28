@@ -1,5 +1,5 @@
 from grano.core import app, db
-from grano import core
+from grano import core, web
 
 from nose.tools import *
 from nose.plugins.skip import SkipTest
