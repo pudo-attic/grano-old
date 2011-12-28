@@ -169,6 +169,12 @@ write operations as well.
   submitted. If ``slug`` is missing, it will be derived from the 
   ``title``. After the initial creation, the ``slug`` will become 
   immutable.
+* ``GET /api/1/networks/<slug>`` - retrieve a full JSON representation
+  of a specific network, identified by ``slug``. 
+* ``PUT /api/1/networks/<slug>`` - update a network by submitting a 
+  modified form of its representation. ``slug`` cannot be changed.
+* ``DELETE /api/1/networks/<slug>`` - delete a network; this does not 
+  actually remove the record but flags it as deleted in the database.
 
 Authentication and authorization is not yet available in the current 
 version.
