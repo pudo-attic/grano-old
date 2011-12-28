@@ -125,7 +125,6 @@ Relation (edge) representation::
 Domain Model
 ------------
 
-
 Questions: 
 
 * Are schema types for entities and relations per-network or global?
@@ -133,6 +132,22 @@ Questions:
 * Is the graph name spaced by network?
 * Are slugs constant?
 
+**How does versioning work?**
+
+Entities and relations - the nodes and edges of the graph - are
+versioned. Each write operation will create a complete copy of the
+object that shares the ID of all other versions of the object. It
+will be distinguished from other versions through a serial number,
+identifying the time at which it was created. 
+
+Further, a ``current`` flag will be set for exactly one version of 
+each revisioned object. This need not necessarily be the latest one, 
+but it will be returned from queries by default. Relations inside the 
+graph are also set up to always link to the current revision of the
+object, i.e. links update themselves.
+
+**TODO**: Create indexes at least on: ``(id,)``, ``(id, current)``, 
+``(id, serial)``.
 
 Links, References and Prior Art
 -------------------------------
