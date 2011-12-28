@@ -14,6 +14,9 @@ def validate_entity(data, schema):
             nonempty_string,
             in_([schema.name])
         )))
+    # TODO: valid network
+    # TODO: summary
+    # TODO: description
     entity = apply_schema(entity, schema)
     return entity.deserialize(data)
 
