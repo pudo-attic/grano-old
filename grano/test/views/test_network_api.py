@@ -31,4 +31,8 @@ class NetworkAPITestCase(unittest.TestCase):
         assert len(body)==0, body
 
     def test_network_create(self):
-        assert False
+        res = self.app.post('/api/v1/networks', 
+                      data=NETWORK_FIXTURE,
+                      follow_redirects=True)
+        body = json.loads(res.data)
+        assert body['title']==NETWORK_FIXTURE['title'], body

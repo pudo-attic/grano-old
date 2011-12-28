@@ -2,8 +2,6 @@ import re
 
 from colander import SchemaNode, Function, String
 from colander import Mapping, Sequence
-from colander import SchemaType, Invalid
-
 
 def _node(schema, name, *children, **kw):
     if 'validator' in kw:
@@ -78,6 +76,11 @@ def database_name(name):
                 "letters, numbers and underscores")
     return True
 
+def slug_name(name):
+    if not re.match(r"^[\w\-\_]+$", name):
+        return ("Name must include only "
+                "letters, numbers and underscores")
+    return True
 
 def nonempty_string(text):
     if not isinstance(text, basestring):
