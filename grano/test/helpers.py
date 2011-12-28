@@ -49,9 +49,3 @@ def make_test_app(use_cookies=False):
 def tear_down_test_app():
     db.session.rollback()
     db.drop_all()
-    for table_name in db.metadata.tables.keys():
-        if table_name.startswith('entity_') or \
-           table_name.startswith('relation_'):
-            table = db.metadata.tables[table_name]
-            db.metadata.remove(table)
-    #assert False

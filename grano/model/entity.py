@@ -42,7 +42,7 @@ class Entity(db.Model, RevisionedMixIn):
         self.slug = util.slugify(self.title)
         self.summary = data.get('summary')
         self.description = data.get('description')
-        # TODO: network.
+        self.network = data.get('network')
 
     def as_dict(self):
         return {

@@ -37,6 +37,8 @@ class Schema(object):
         if self._cls is None:
             self._cls = self._make_cls()
             table = self._cls.__table__
+            if table.name in db.metadata.tables:
+                table.metadata.remove(table)
             table.metadata.bind = db.engine
             if not table.exists():
                 table.create()

@@ -26,10 +26,9 @@ class Relation(db.Model, RevisionedMixIn):
         backref=db.backref('all_relations', lazy='dynamic'))
     
     def update_values(self, schema, data):
-        # TODO: source
-        # TODO: target
-        # TODO: network
-        pass
+        self.source_id = data.get('source').id
+        self.target_id = data.get('target').id
+        self.network = data.get('network')
 
     def as_dict(self):
         return {
