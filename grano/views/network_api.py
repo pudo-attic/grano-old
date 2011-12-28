@@ -17,7 +17,8 @@ def _get_network(slug):
 @api.route('/networks', methods=['GET'])
 def index():
     """ List all available networks. """
-    return jsonify(list(Network.all()))
+    slugs = [n.slug for n in Network.all()]
+    return jsonify(slugs)
 
 @api.route('/networks', methods=['POST'])
 def create():

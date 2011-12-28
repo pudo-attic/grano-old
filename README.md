@@ -149,6 +149,30 @@ object, i.e. links update themselves.
 **TODO**: Create indexes at least on: ``(id,)``, ``(id, current)``, 
 ``(id, serial)``.
 
+REST API
+--------
+
+The first iteration of the API will expose three primary resources: 
+``network``, ``entity`` and ``relation``. Each of those expose basic
+CRUD methods to list, read and write the data. The read and write
+representations are usually equivalent. The REST API uses JSON for 
+up- and download, although generic form data is supported for all 
+write operations as well.
+
+**Network**
+
+* ``GET /api/1/networks`` - list all the stored networks. This is a 
+  list of slugs that can be resolved individually to retrieve more 
+  data.
+* ``POST /api/1/networks`` - create a new entity; requires at least 
+  a ``title``, optionally a ``description`` and ``slug`` can also be
+  submitted. If ``slug`` is missing, it will be derived from the 
+  ``title``. After the initial creation, the ``slug`` will become 
+  immutable.
+
+Authentication and authorization is not yet available in the current 
+version.
+
 Links, References and Prior Art
 -------------------------------
 
