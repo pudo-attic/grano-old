@@ -48,6 +48,12 @@ class RevisionedMixIn(object):
     def update_values(self, schema, data):
         raise TypeError()
 
+    def delete(self, schema):
+        table = schema.parent_cls.__table__
+        q = table.update().where(table.c.id==self.id)
+        q = q.values({'current': False})
+        db.session.execute(q)
+
     @classmethod
     def current_by_id(cls, id):
         q = db.session.query(cls)
@@ -56,9 +62,11 @@ class RevisionedMixIn(object):
         return q.first()
 
     @classmethod
-    def all(cls):
+    def all(cls, network=None):
         q = db.session.query(cls)
         q = q.filter_by(current=True)
+        if network is not None:
+            q = q.filter_by(network=network)
         return q
 
 
