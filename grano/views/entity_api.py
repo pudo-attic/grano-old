@@ -23,16 +23,16 @@ def _get_entity(id):
 
 @api.route('/entities', methods=['GET'])
 def index():
-    """ List all available entities in the given network. """
-    slugs = [e.id for e in Entity.all()]
-    return jsonify(slugs)
+    """ List all available entities. """
+    ids = [e.id for e in Entity.all()]
+    return jsonify(ids)
 
 @api.route('/networks/<slug>/entities', methods=['GET'])
 def network_index(slug):
     """ List all available entities in the given network. """
     network = _get_network(slug)
-    slugs = [e.id for e in Entity.all(network=network)]
-    return jsonify(slugs)
+    ids = [e.id for e in Entity.all(network=network)]
+    return jsonify(ids)
 
 @api.route('/entities', methods=['POST'])
 def create():
