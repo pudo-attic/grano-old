@@ -53,6 +53,12 @@ def get(id):
     entity = _get_entity(id)
     return jsonify(entity)
 
+@api.route('/entities/<id>/history', methods=['GET'])
+def history(id):
+    """ Get a JSON representation of the entity's revision history. """
+    entity = _get_entity(id)
+    return jsonify(entity.history)
+
 @api.route('/entities/<id>', methods=['PUT'])
 def update(id):
     """ Update the data of the entity. """
@@ -62,7 +68,7 @@ def update(id):
     schema = _get_schema(data.get('type'))
     data = validate_entity(dict(data.items()), 
             schema, context)
-    updated_entity = entity.update(data)
+    updated_entity = entity.update(schema, data)
     db.session.commit()
     return jsonify(updated_entity)
 

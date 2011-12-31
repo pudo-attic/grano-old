@@ -2,6 +2,7 @@ from datetime import datetime
 from dateutil import tz
 import json
 
+from sqlalchemy.orm.query import Query
 from werkzeug.exceptions import NotFound
 #from formencode.variabledecode import NestedVariables
 from flask import Response
@@ -53,6 +54,8 @@ class JSONEncoder(json.JSONEncoder):
             return obj.as_dict()
         if isinstance(obj, datetime):
             return obj.isoformat()
+        if isinstance(obj, Query):
+            return list(obj)
         raise TypeError("%r is not JSON serializable" % obj)
 
 def jsonify(obj, status=200, headers=None):

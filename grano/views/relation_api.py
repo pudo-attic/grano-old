@@ -53,6 +53,12 @@ def get(id):
     relation = _get_relation(id)
     return jsonify(relation)
 
+@api.route('/relations/<id>/history', methods=['GET'])
+def history(id):
+    """ Get a JSON representation of the relation. """
+    relation = _get_relation(id)
+    return jsonify(relation.history)
+
 @api.route('/relations/<id>', methods=['PUT'])
 def update(id):
     """ Update the data of the relation. """
@@ -62,8 +68,9 @@ def update(id):
     schema = _get_schema(data.get('type'))
     data = validate_relation(dict(data.items()), 
             schema, context)
-    updated_relation = relation.update(data)
+    updated_relation = relation.update(schema, data)
     db.session.commit()
+    print "UPDATED", updated_relation
     return jsonify(updated_relation)
 
 @api.route('/relations/<id>', methods=['DELETE'])

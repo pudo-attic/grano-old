@@ -49,6 +49,11 @@ class EntityAPITestCase(unittest.TestCase):
         res = self.app.get('/api/1/entities/%s' % self.id)
         body = json.loads(res.data)
         assert body['title']==ENTITY_FIXTURE['title'], body
+    
+    def test_get(self):
+        res = self.app.get('/api/1/entities/%s/history' % self.id)
+        body = json.loads(res.data)
+        assert len(body)==1,body
 
     def test_get_non_existent(self):
         res = self.app.get('/api/1/entities/bonobo')
@@ -67,6 +72,20 @@ class EntityAPITestCase(unittest.TestCase):
         res = self.app.post('/api/1/entities', data=data,
                       follow_redirects=True)
         assert res.status_code==400,res.status_code
+    
+    def test_update(self):
+        res = self.app.get('/api/1/entities/%s' % self.id)
+        body = json.loads(res.data)
+        t = 'A banana'
+        body['title'] = t
+        res = self.app.put('/api/1/entities/%s' % self.id, data=body)
+        assert res.status_code==200,res.status_code
+        body = json.loads(res.data)
+        assert body['title']==t, body
+        
+        res = self.app.get('/api/1/entities/%s/history' % self.id)
+        body = json.loads(res.data)
+        assert len(body)==2,body
 
     def test_entity_delete_nonexistent(self):
         res = self.app.delete('/api/1/networks/the-one')

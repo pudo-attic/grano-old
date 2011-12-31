@@ -72,6 +72,11 @@ class RelationAPITestCase(unittest.TestCase):
         res = self.app.get('/api/1/relations/%s' % self.id)
         body = json.loads(res.data)
         assert body['link_type']==RELATION_FIXTURE['link_type'], body
+    
+    def test_history(self):
+        res = self.app.get('/api/1/relations/%s/history' % self.id)
+        body = json.loads(res.data)
+        assert len(body)==1, body
 
     def test_get_non_existent(self):
         res = self.app.get('/api/1/relations/bonobo')
@@ -90,6 +95,19 @@ class RelationAPITestCase(unittest.TestCase):
         res = self.app.post('/api/1/relations', data=data,
                       follow_redirects=True)
         assert res.status_code==400,res.status_code
+
+    def test_update(self):
+        res = self.app.get('/api/1/relations/%s' % self.id)
+        body = json.loads(res.data)
+        body['link_type'] = 'foeOf'
+        res = self.app.put('/api/1/relations/%s' % self.id, data=body)
+        assert res.status_code==200,res.status_code
+        body = json.loads(res.data)
+        assert body['link_type']=='foeOf', body
+        
+        res = self.app.get('/api/1/relations/%s/history' % self.id)
+        body = json.loads(res.data)
+        assert len(body)==2, body
 
     def test_relation_delete_nonexistent(self):
         res = self.app.delete('/api/1/relations/the-one')

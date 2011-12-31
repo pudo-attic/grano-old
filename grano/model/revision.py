@@ -54,6 +54,13 @@ class RevisionedMixIn(object):
         q = q.values({'current': False})
         db.session.execute(q)
 
+    @property
+    def history(self):
+        q = db.session.query(self.__class__)
+        q = q.filter_by(id=self.id)
+        q = q.order_by(self.__class__.created_at.asc())
+        return q
+
     @classmethod
     def current_by_id(cls, id):
         q = db.session.query(cls)
