@@ -1,5 +1,6 @@
-from grano.core import app, db, schema_registry
+from grano.core import app, db
 from grano import core, web
+from grano.model import schema_registry
 
 from nose.tools import *
 from nose.plugins.skip import SkipTest

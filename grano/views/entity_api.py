@@ -1,7 +1,7 @@
 from flask import Blueprint, request, redirect, url_for
 
-from grano.core import db, schema_registry
-from grano.model import Entity
+from grano.core import db
+from grano.model import Entity, schema_registry
 from grano.validation import validate_entity, ValidationContext
 from grano.views.network_api import _get_network
 from grano.util import request_content, jsonify

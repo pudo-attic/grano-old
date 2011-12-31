@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-from grano.core import schema_registry
+from grano.model import schema_registry
 from grano.util import jsonify
 from grano.exc import NotFound
 
