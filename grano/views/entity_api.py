@@ -63,12 +63,11 @@ def history(id):
 def update(id):
     """ Update the data of the entity. """
     entity = _get_entity(id)
-    data = request_content(request)
+    data = dict(request_content(request).items())
     data['type'] = entity.type
     context = ValidationContext(network=entity.network)
     schema = _get_schema(data.get('type'))
-    data = validate_entity(dict(data.items()), 
-            schema, context)
+    data = validate_entity(data, schema, context)
     updated_entity = entity.update(schema, data)
     db.session.commit()
     return jsonify(updated_entity)

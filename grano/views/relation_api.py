@@ -63,12 +63,11 @@ def history(id):
 def update(id):
     """ Update the data of the relation. """
     relation = _get_relation(id)
-    data = request_content(request)
+    data = dict(request_content(request).items())
     data['type'] = relation.type
     context = ValidationContext(network=relation.network)
     schema = _get_schema(data.get('type'))
-    data = validate_relation(dict(data.items()), 
-            schema, context)
+    data = validate_relation(data, schema, context)
     updated_relation = relation.update(schema, data)
     db.session.commit()
     print "UPDATED", updated_relation
