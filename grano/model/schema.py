@@ -24,6 +24,7 @@ class Schema(object):
     """
 
     def __init__(self, parent_cls, data):
+        self.data = data
         self.parent_cls = parent_cls
         self.name = str(data['name'])
         self.label = data['label']
@@ -83,6 +84,8 @@ class Schema(object):
 
         return type(self.name, (self.parent_cls,), cls)
 
+    def as_dict(self):
+        return self.data
 
 class Attribute(object):
     """ Attributes are specific properties of a schema for either an entity or 
