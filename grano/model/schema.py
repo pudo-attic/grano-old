@@ -25,7 +25,7 @@ class Schema(object):
 
     def __init__(self, parent_cls, data):
         self.parent_cls = parent_cls
-        self.name = data['name']
+        self.name = str(data['name'])
         self.label = data['label']
         self.attributes = []
         self._cls = None
