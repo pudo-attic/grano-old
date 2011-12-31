@@ -17,7 +17,7 @@ class TestSchema(unittest.TestCase):
         schema = Schema(Entity, h.TEST_ENTITY_SCHEMA.copy())
         assert schema.name==h.TEST_ENTITY_SCHEMA['name']
         assert schema.label==h.TEST_ENTITY_SCHEMA['label']
-        assert len(schema.attributes)==3, schema.attributes
+        assert len(schema.attributes)==4, schema.attributes
     
     def test_attribute(self):
         schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)

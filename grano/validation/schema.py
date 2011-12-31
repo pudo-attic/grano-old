@@ -26,6 +26,7 @@ def attribute_schema(name):
         name_wrap(database_name, name)
         ))
     schema.add(key('label', validator=nonempty_string))
+    schema.add(key('missing', missing=None))
     schema.add(key('type', validator=chained(
             nonempty_string,
             in_(ATTRIBUTE_TYPES_DB)
@@ -57,7 +58,7 @@ def apply_schema(base, schema):
     schema. """
     for attribute in schema.attributes:
         validator = ATTRIBUTE_VALIDATORS[attribute.type]
-        # TODO: does this need to support `missing` and `empty`.
-        base.add(_node(validator(), attribute.name))
+        base.add(_node(validator(), attribute.name, 
+                 missing=attribute.missing))
     return base
 

@@ -23,8 +23,14 @@ TEST_ENTITY_SCHEMA = {
             'type': 'string',
             'label': 'Birth Place',
             'help': 'The place of birth.'
+            },
+        'shoe_size': {
+            'type': 'integer',
+            'label': 'Shoe Size',
+            'help': 'European shoe size',
+            'missing': 40
             }
-        }
+        },
     }
 
 TEST_RELATION_SCHEMA = {

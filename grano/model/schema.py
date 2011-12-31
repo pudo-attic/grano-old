@@ -1,3 +1,5 @@
+import colander
+
 from grano.core import db
 
 ATTRIBUTE_TYPES_DB = {
@@ -97,6 +99,10 @@ class Attribute(object):
         self.type = data['type']
         self.label = data['label']
         self.help = data.get('help')
+        if 'missing' in data:
+            self.missing = data.get('missing')
+        else:
+            self.missing = colander.required
 
     @property
     def column_type(self):
