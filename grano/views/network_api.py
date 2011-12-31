@@ -37,7 +37,7 @@ def get(slug):
     network = _get_network(slug)
     return jsonify(network)
 
-@api.route('/network/<slug>', methods=['PUT'])
+@api.route('/networks/<slug>', methods=['PUT'])
 def update(slug):
     """ Update the data of the network. """
     network = _get_network(slug)

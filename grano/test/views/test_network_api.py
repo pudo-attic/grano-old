@@ -45,6 +45,17 @@ class NetworkAPITestCase(unittest.TestCase):
         res = self.app.post('/api/1/networks', data=data,
                       follow_redirects=True)
         assert res.status_code==400,res.status_code
+    
+    def test_network_update(self):
+        res = self.app.get('/api/1/networks/the-one-percent')
+        body = json.loads(res.data)
+        t = 'Spidernet'
+        body['title'] = t
+        res = self.app.put('/api/1/networks/the-one-percent', 
+                           data=body)
+        assert res.status_code==200,res.status_code
+        body = json.loads(res.data)
+        assert body['title']==t, body
 
     def test_network_delete_nonexistent(self):
         res = self.app.delete('/api/1/networks/the-one')
