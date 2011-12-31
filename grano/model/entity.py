@@ -45,7 +45,7 @@ class Entity(db.Model, RevisionedMixIn):
         self.network = data.get('network')
 
     def delete(self, schema):
-        super(RevisionedMixIn, self).delete(schema)
+        super(Entity, self).delete(schema)
         # TODO: how to get relation schemata?
         #for relation in self.incoming:
         #    relation.delete()
