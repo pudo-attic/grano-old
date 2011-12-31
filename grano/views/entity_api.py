@@ -64,6 +64,7 @@ def update(id):
     """ Update the data of the entity. """
     entity = _get_entity(id)
     data = request_content(request)
+    data['type'] = entity.type
     context = ValidationContext(network=entity.network)
     schema = _get_schema(data.get('type'))
     data = validate_entity(dict(data.items()), 

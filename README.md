@@ -164,7 +164,7 @@ write operations as well.
 * ``GET /api/1/networks`` - list all the stored networks. This is a 
   list of slugs that can be resolved individually to retrieve more 
   data.
-* ``POST /api/1/networks`` - create a new entity; requires at least 
+* ``POST /api/1/networks`` - create a new network; requires at least 
   a ``title``, optionally a ``description`` and ``slug`` can also be
   submitted. If ``slug`` is missing, it will be derived from the 
   ``title``. After the initial creation, the ``slug`` will become 
@@ -175,6 +175,50 @@ write operations as well.
   modified form of its representation. ``slug`` cannot be changed.
 * ``DELETE /api/1/networks/<slug>`` - delete a network; this does not 
   actually remove the record but flags it as deleted in the database.
+
+**Entity**
+
+* ``GET /api/1/entities`` - list all ids of entities in the database.
+* ``GET /api/1/network/<slug>/entities`` - list all ids of entities 
+  in the given network.
+* ``POST /api/1/entities`` - create a new entity; requires at least 
+  a ``title`` and a ``type``, optionally a ``description``, ``summary``
+  and ``slug`` can also be submitted. If ``slug`` is missing, it will
+  be derived from the ``title``. Further, any additional fields 
+  mandated by the schema given through ``type`` must also be specified.
+* ``GET /api/1/entities/<id>`` - retrieve a full JSON representation
+  of a specific entity, identified by ``id``. 
+* ``GET /api/1/entities/<id>/history`` - retrieve the full history of
+  the entity identified by ``id``, including the full JSON 
+  representation of all prior revisions.
+* ``PUT /api/1/entities/<id>`` - update an entity by submitting a 
+  modified form of its representation. ``type`` (and thus the required
+  set of dependent attributes) cannot be changed.
+* ``DELETE /api/1/entities/<id>`` - delete an entity; this does not 
+  actually remove the record but removes any ``current`` flag from the
+  database.
+
+**Relation**
+
+* ``GET /api/1/relations`` - list all ids of relations in the database.
+* ``GET /api/1/network/<slug>/relations`` - list all ids of relations 
+  in the given network.
+* ``POST /api/1/relations`` - create a new relation; requires at least 
+  a ``type`` and both ``source`` and ``target`` to be valid entity IDs
+  Further, any additional fields mandated by the schema given through 
+  ``type`` must also be specified.
+* ``GET /api/1/relations/<id>`` - retrieve a full JSON representation
+  of a specific relation, identified by ``id``. 
+* ``GET /api/1/relations/<id>/history`` - retrieve the full history of
+  the relation identified by ``id``, including the full JSON 
+  representation of all prior revisions.
+* ``PUT /api/1/relations/<id>`` - update a relation by submitting a 
+  modified form of its representation. ``source``, ``target`` and 
+  ``type`` (and thus the required set of dependent attributes) cannot 
+  be changed.
+* ``DELETE /api/1/relations/<id>`` - delete a relatin; this does not 
+  actually remove the record but removes any ``current`` flag from the
+  database.
 
 Authentication and authorization is not yet available in the current 
 version.
