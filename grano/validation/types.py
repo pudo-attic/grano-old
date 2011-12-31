@@ -23,7 +23,7 @@ class NetworkSchemaType(SchemaType):
         obj = Network.by_slug(slug)
         if obj is None:
             raise Invalid(node, "No such network: %r")
-        if obj.id != self.context.network.id:
+        if self.context.network and obj.id != self.context.network.id:
             raise Invalid(node, "%r is not the current network.")
         return obj
 
