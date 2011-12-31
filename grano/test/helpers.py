@@ -1,4 +1,4 @@
-from grano.core import app, db
+from grano.core import app, db, schema_registry
 from grano import core, web
 
 from nose.tools import *
@@ -37,6 +37,8 @@ TEST_RELATION_SCHEMA = {
         }
     }
 
+TEST_SCHEMA = {'entity': [TEST_ENTITY_SCHEMA], 'relation': [TEST_RELATION_SCHEMA]}
+
 def skip(*args, **kwargs):
     raise SkipTest(*args, **kwargs)
 
@@ -45,6 +47,10 @@ def make_test_app(use_cookies=False):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     db.create_all()
     return app.test_client(use_cookies=use_cookies)
+
+def load_registry():
+    from grano.validation.schema_loader import SchemaLoader
+    SchemaLoader.load_data(schema_registry, TEST_SCHEMA)
 
 def tear_down_test_app():
     db.session.rollback()
