@@ -44,7 +44,7 @@ class EntitySchemaType(SchemaType):
         obj = Entity.current_by_id(id)
         if obj is None:
             raise Invalid(node, "No such entity: %r")
-        if obj.network_id != self.context.network.id:
+        if self.context.network and obj.network_id != self.context.network.id:
             raise Invalid(node, "%r is not the current network.")
         return obj
 
