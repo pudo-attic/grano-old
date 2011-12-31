@@ -220,6 +220,15 @@ write operations as well.
   actually remove the record but removes any ``current`` flag from the
   database.
 
+**Schema**
+
+* ``GET /api/1/schemata/entity`` - list the names of all schemata for 
+  entities. 
+* ``GET /api/1/schemata/relation`` - list the names of all schemata for 
+  relations. 
+* ``GET /api/1/schemata/[entity|relation]/<name>`` - get the full JSON 
+  representation of a specific schema type.
+
 Authentication and authorization is not yet available in the current 
 version.
 
