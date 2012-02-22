@@ -8,8 +8,19 @@
       {% block content %}
         - No Content -
       {% endblock %}
+      <ul id="network-list">
+      </ul>
     </div>
   </body>
+
+  <script type="text/template" id="network-list-item">
+    <li><a href='#networks/<%= slug %>'><%= title %></a></li>
+  </script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+  <script src="http://documentcloud.github.com/backbone/backbone-min.js"></script>
+  <script src="/static/js/app.js"></script>
 </html>
 
 
