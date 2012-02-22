@@ -18,7 +18,7 @@ ATTRIBUTE_VALIDATORS = {
     'date': colander.DateTime
     }
 
-def attribute_schema(name):
+def attribute_schema(name, meta):
     """ Validate the representation of a schema attribute. """
     schema = mapping(name, validator=chained(
         name_wrap(nonempty_string, name),
@@ -47,8 +47,8 @@ def validate_schema(data):
             nonempty_string,
         )))
     attributes = mapping('attributes')
-    for attribute in data.get('attributes', {}):
-        attributes.add(attribute_schema(attribute))
+    for attribute, meta in data.get('attributes', {}).items():
+        attributes.add(attribute_schema(attribute, meta))
     schema.add(attributes)
     return schema.deserialize(data)
 
