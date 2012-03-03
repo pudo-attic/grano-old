@@ -2,6 +2,7 @@ import unittest
 import json
 from copy import deepcopy
 
+from grano.test.helpers import AUTHZ_HEADER
 
 NETWORK_FIXTURE = {'slug': 'net', 'title': 'Test Network'}
 
@@ -28,8 +29,9 @@ class EntityAPITestCase(unittest.TestCase):
         tear_down_test_app()
 
     def make_fixtures(self):
-        self.app.post('/api/1/networks', 
-                      data=NETWORK_FIXTURE)
+        self.app.post('/api/1/networks',
+                    headers=AUTHZ_HEADER,
+                    data=NETWORK_FIXTURE)
         network = Network.by_slug(NETWORK_FIXTURE['slug'])
         Schema.create(network, Schema.RELATION,
                       h.TEST_RELATION_SCHEMA)
@@ -37,8 +39,9 @@ class EntityAPITestCase(unittest.TestCase):
                       h.TEST_ENTITY_SCHEMA)
         db.session.commit()
         res = self.app.post('/api/1/net/entities', 
-                      data=ENTITY_FIXTURE, 
-                      follow_redirects=True)
+                    headers=AUTHZ_HEADER,
+                    data=ENTITY_FIXTURE, 
+                    follow_redirects=True)
         body = json.loads(res.data)
         self.id = body['id']
 
@@ -65,14 +68,16 @@ class EntityAPITestCase(unittest.TestCase):
         data = deepcopy(ENTITY_FIXTURE)
         data['title'] = 'Tigger'
         res = self.app.post('/api/1/net/entities', data=data,
-                      follow_redirects=True)
+                    headers=AUTHZ_HEADER,
+                    follow_redirects=True)
         body = json.loads(res.data)
         assert body['title']==data['title'], body
 
     def test_entity_create_invalid(self):
         data = {'description': 'no'}
         res = self.app.post('/api/1/net/entities', data=data,
-                      follow_redirects=True)
+                    headers=AUTHZ_HEADER,
+                    follow_redirects=True)
         assert res.status_code==400,res.status_code
     
     def test_update(self):
@@ -80,7 +85,9 @@ class EntityAPITestCase(unittest.TestCase):
         body = json.loads(res.data)
         t = 'A banana'
         body['title'] = t
-        res = self.app.put('/api/1/net/entities/%s' % self.id, data=body)
+        res = self.app.put('/api/1/net/entities/%s' % self.id, 
+                    headers=AUTHZ_HEADER,
+                    data=body)
         assert res.status_code==200,res.status_code
         body = json.loads(res.data)
         assert body['title']==t, body
@@ -90,14 +97,13 @@ class EntityAPITestCase(unittest.TestCase):
         assert len(body)==2,body
 
     def test_entity_delete_nonexistent(self):
-        res = self.app.delete('/api/1/net/entities/the-one')
+        res = self.app.delete('/api/1/net/entities/the-one',
+                    headers=AUTHZ_HEADER)
         assert res.status_code==404,res.status_code
 
     def test_entity_delete(self):
-        res = self.app.delete('/api/1/net/entities/%s' % self.id)
+        res = self.app.delete('/api/1/net/entities/%s' % self.id,
+                    headers=AUTHZ_HEADER)
         assert res.status_code==410,res.status_code
         res = self.app.get('/api/1/net/entities/%s' % self.id)
         assert res.status_code==404,res.status_code
-
-
-

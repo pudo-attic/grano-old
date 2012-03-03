@@ -3,7 +3,7 @@ from colander import Invalid
 
 from grano.model import Account
 from grano.core import app, current_user, login_manager
-from grano.util import response_format, jsonify, invalid_dict
+from grano.util import response_format, jsonify, login_user
 from grano.views import *
 
 
@@ -16,6 +16,20 @@ def set_template_context():
 @login_manager.user_loader
 def load_account(name):
     return Account.by_name(name)
+
+
+@app.before_request
+def basic_authentication():
+    """ Attempt HTTP basic authentication on a per-request basis. """
+    if 'Authorization' in request.headers:
+        authorization = request.headers.get('Authorization')
+        authorization = authorization.split(' ', 1)[-1]
+        name, password = authorization.decode('base64').split(':', 1)
+        account = Account.by_name(name)
+        if account is None \
+            or not account.validate_password(password) \
+            or not login_user(account):
+            raise Unauthorized('Invalid username or password.')
 
 
 @app.errorhandler(401)
@@ -48,5 +62,3 @@ def handle_validation_error(exc):
 
 if __name__ == "__main__":
     app.run()
-
-

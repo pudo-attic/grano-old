@@ -10,10 +10,12 @@ from grano.util import invalid_dict, login_user, logout_user
 
 section = Blueprint('account', __name__)
 
+
 @section.route('/register', methods=['GET'])
 def register_form():
     """ Show the sign-up form. """
     return render_template('account/register.tmpl')
+
 
 @section.route('/register', methods=['POST'])
 def register_save():
@@ -31,10 +33,12 @@ def register_save():
                           data,
                           invalid_dict(inv))
 
+
 @section.route('/login', methods=['GET'])
 def login_form():
     """ Show the login form. """
     return render_template('account/login.tmpl')
+
 
 @section.route('/login', methods=['POST'])
 def login_save():
@@ -49,9 +53,9 @@ def login_save():
     flash("Welcome back, %s!" % account.display_name, 'success')
     return redirect(url_for('home.index'))
 
+
 @section.route('/logout', methods=['GET'])
 def logout():
     flash("You've been logged out.", 'success')
     logout_user()
     return redirect(url_for('home.index'))
-

@@ -1,4 +1,5 @@
 # TODO: Make sense.
+from grano.auth.util import logged_in
 
 
 def list():
@@ -6,7 +7,7 @@ def list():
 
 
 def create():
-    return True
+    return logged_in()
 
 
 def read(network):
@@ -14,8 +15,8 @@ def read(network):
 
 
 def update(network):
-    return True
+    return logged_in()
 
 
 def delete(network):
-    return True
+    return logged_in()

@@ -44,16 +44,32 @@ TEST_RELATION_SCHEMA = {
         }
     }
 
+TEST_USER = {
+    'name': 'hugo',
+    'fullname': 'Hungry Hugo',
+    'email': 'hungry@hugo.org',
+    'password': 'foo'
+    }
+
+AUTHZ = '%s:%s' % (TEST_USER['name'], TEST_USER['password'])
+AUTHZ_HEADER = {'Authorization': 'Basic ' + AUTHZ.encode('base64').strip()}
+
+
 def skip(*args, **kwargs):
     raise SkipTest(*args, **kwargs)
+
 
 def make_test_app(use_cookies=False):
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     #import ipdb; ipdb.set_trace()
-    from grano.model import *
+    from grano.model import Account
     db.create_all()
-    return app.test_client(use_cookies=use_cookies)
+    client = app.test_client(use_cookies=use_cookies)
+    app.test_user = Account.create(TEST_USER)
+    db.session.commit()
+    return client
+
 
 def tear_down_test_app():
     db.session.rollback()

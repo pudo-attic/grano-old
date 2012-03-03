@@ -6,6 +6,7 @@ from grano.core import db
 from grano.model import Network, Schema
 from grano.test import helpers as h
 from grano.test.helpers import make_test_app, tear_down_test_app
+from grano.test.helpers import AUTHZ_HEADER
 
 NETWORK_FIXTURE = {'title': 'The One Percent',
                    'slug': 'net',
@@ -24,8 +25,9 @@ class SchemaAPITestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = make_test_app()
-        self.app.post('/api/1/networks', 
-                      data=NETWORK_FIXTURE)
+        self.app.post('/api/1/networks',
+                    headers=AUTHZ_HEADER,
+                    data=NETWORK_FIXTURE)
         network = Network.by_slug(NETWORK_FIXTURE['slug'])
         Schema.create(network, Schema.RELATION,
                       h.TEST_RELATION_SCHEMA)
@@ -62,6 +64,7 @@ class SchemaAPITestCase(unittest.TestCase):
         body = json.loads(res.data)
         body['label'] = "XXXX"
         res = self.app.put('/api/1/net/schemata/entity/person',
+                headers=AUTHZ_HEADER,
                 data=json.dumps(body),
                 content_type='application/json',
                 follow_redirects=True)
@@ -78,6 +81,7 @@ class SchemaAPITestCase(unittest.TestCase):
                 'help': 'The person\' eye color.'
             }
         res = self.app.put('/api/1/net/schemata/entity/person',
+                headers=AUTHZ_HEADER,
                 data=json.dumps(body),
                 content_type='application/json',
                 follow_redirects=True)
@@ -86,8 +90,9 @@ class SchemaAPITestCase(unittest.TestCase):
         assert body['attributes']['eye_color']['type']=='string', \
                 body['attributes']
         res = self.app.post('/api/1/net/entities',
-                      data=ENTITY_FIXTURE,
-                      follow_redirects=True)
+                    headers=AUTHZ_HEADER,
+                    data=ENTITY_FIXTURE,
+                    follow_redirects=True)
         body = json.loads(res.data)
         assert body['eye_color']==ENTITY_FIXTURE['eye_color'], \
                 body
@@ -109,6 +114,7 @@ class SchemaAPITestCase(unittest.TestCase):
         data = deepcopy(h.TEST_ENTITY_SCHEMA)
         data['name'] = 'duck'
         res = self.app.post('/api/1/net/schemata/entity',
+                headers=AUTHZ_HEADER,
                 data=json.dumps(data),
                 content_type='application/json',
                 follow_redirects=True)
@@ -120,17 +126,20 @@ class SchemaAPITestCase(unittest.TestCase):
         data['name'] = 'duck'
         del data['label']
         res = self.app.post('/api/1/net/schemata/entity',
+                headers=AUTHZ_HEADER,
                 data=json.dumps(data),
                 content_type='application/json',
                 follow_redirects=True)
         assert res.status_code==400,res.status_code
 
     def test_schema_delete_nonexistent(self):
-        res = self.app.delete('/api/1/net/schemata/entity/the-one')
+        res = self.app.delete('/api/1/net/schemata/entity/the-one',
+                headers=AUTHZ_HEADER)
         assert res.status_code==404,res.status_code
 
     def test_schema_delete(self):
-        res = self.app.delete('/api/1/net/schemata/entity/person')
+        res = self.app.delete('/api/1/net/schemata/entity/person',
+                headers=AUTHZ_HEADER)
         assert res.status_code==410,res.status_code
         res = self.app.get('/api/1/net/schemata/entity/person')
         assert res.status_code==404,res.status_code

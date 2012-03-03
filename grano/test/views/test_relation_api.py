@@ -2,6 +2,7 @@ import unittest
 import json
 from copy import deepcopy
 
+from grano.test.helpers import AUTHZ_HEADER
 
 NETWORK_FIXTURE = {'slug': 'net', 'title': 'Test Network'}
 
@@ -38,28 +39,32 @@ class RelationAPITestCase(unittest.TestCase):
         tear_down_test_app()
 
     def make_fixtures(self):
-        self.app.post('/api/1/networks', 
-                      data=NETWORK_FIXTURE)
+        self.app.post('/api/1/networks',
+                    headers=AUTHZ_HEADER,
+                    data=NETWORK_FIXTURE)
         network = Network.by_slug(NETWORK_FIXTURE['slug'])
         Schema.create(network, Schema.RELATION,
                       h.TEST_RELATION_SCHEMA)
         Schema.create(network, Schema.ENTITY,
                       h.TEST_ENTITY_SCHEMA)
         res = self.app.post('/api/1/net/entities', 
-                      data=ENTITY1_FIXTURE, 
-                      follow_redirects=True)
+                    headers=AUTHZ_HEADER,
+                    data=ENTITY1_FIXTURE, 
+                    follow_redirects=True)
         body = json.loads(res.data)
         self.source_id = body['id']
-        res = self.app.post('/api/1/net/entities', 
-                      data=ENTITY2_FIXTURE, 
-                      follow_redirects=True)
+        res = self.app.post('/api/1/net/entities',
+                    headers=AUTHZ_HEADER,
+                    data=ENTITY2_FIXTURE, 
+                    follow_redirects=True)
         body = json.loads(res.data)
         self.target_id = body['id']
         RELATION_FIXTURE['source'] = self.source_id
         RELATION_FIXTURE['target'] = self.target_id
         res = self.app.post('/api/1/net/relations', 
-                      data=RELATION_FIXTURE, 
-                      follow_redirects=True)
+                    headers=AUTHZ_HEADER,
+                    data=RELATION_FIXTURE, 
+                    follow_redirects=True)
         print res.data
         body = json.loads(res.data)
         self.id = body['id']
@@ -86,14 +91,18 @@ class RelationAPITestCase(unittest.TestCase):
     def test_relation_create(self):
         data = deepcopy(RELATION_FIXTURE)
         data['link_type'] = 'toyOf'
-        res = self.app.post('/api/1/net/relations', data=data,
+        res = self.app.post('/api/1/net/relations', 
+                      data=data,
+                      headers=AUTHZ_HEADER,
                       follow_redirects=True)
         body = json.loads(res.data)
         assert body['link_type']==data['link_type'], body
 
     def test_relation_create_invalid(self):
         data = {'source': 'no', 'target': self.target_id}
-        res = self.app.post('/api/1/net/relations', data=data,
+        res = self.app.post('/api/1/net/relations', 
+                      data=data,
+                      headers=AUTHZ_HEADER,
                       follow_redirects=True)
         assert res.status_code==400,res.status_code
 
@@ -101,7 +110,9 @@ class RelationAPITestCase(unittest.TestCase):
         res = self.app.get('/api/1/net/relations/%s' % self.id)
         body = json.loads(res.data)
         body['link_type'] = 'foeOf'
-        res = self.app.put('/api/1/net/relations/%s' % self.id, data=body)
+        res = self.app.put('/api/1/net/relations/%s' % self.id, 
+                      headers=AUTHZ_HEADER,
+                      data=body)
         assert res.status_code==200,res.status_code
         body = json.loads(res.data)
         assert body['link_type']=='foeOf', body
@@ -111,11 +122,13 @@ class RelationAPITestCase(unittest.TestCase):
         assert len(body)==2, body
 
     def test_relation_delete_nonexistent(self):
-        res = self.app.delete('/api/1/net/relations/the-one')
+        res = self.app.delete('/api/1/net/relations/the-one',
+                        headers=AUTHZ_HEADER,)
         assert res.status_code==404,res.status_code
 
     def test_relation_delete(self):
-        res = self.app.delete('/api/1/net/relations/%s' % self.id)
+        res = self.app.delete('/api/1/net/relations/%s' % self.id,
+                        headers=AUTHZ_HEADER)
         assert res.status_code==410,res.status_code
         res = self.app.get('/api/1/net/relations/%s' % self.id)
         assert res.status_code==404,res.status_code
