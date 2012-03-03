@@ -3,6 +3,7 @@ import warnings;
 warnings.filterwarnings('ignore', 'Unicode type received non-unicode bind param value.')
 from sqlalchemy.exc import SAWarning
 warnings.filterwarnings('ignore', category=SAWarning)
+from migrate.versioning.util import construct_engine
 
 from flask import Flask
 from flaskext.sqlalchemy import SQLAlchemy

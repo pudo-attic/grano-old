@@ -26,7 +26,6 @@ class TestSchema(unittest.TestCase):
                                h.TEST_ENTITY_SCHEMA)
         attr = schema.attributes[1]
         assert attr.name=='birth_day', attr.name
-        assert attr.column_type==db.DateTime
 
     def test_generate_type(self):
         schema = Schema.create(self.network, Schema.ENTITY,

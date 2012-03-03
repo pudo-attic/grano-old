@@ -55,11 +55,23 @@ class Schema(db.Model):
         remaining = []
         for name, data in data.get('attributes', {}).items():
             remaining.append(name)
-            self.attributes.append(Attribute.create(name, data))
+            attr = Attribute.create(name, data)
+            self.attributes.append(attr)
         for attribute in self.attributes:
             if not attribute.name in remaining:
                 attribute.delete()
         db.session.flush()
+
+    def migrate(self):
+        table = self._cls.__table__
+        if not table.exists():
+            table.create()
+        for attribute in self.attributes:
+            try:
+                col = table.c[attribute.name]
+                col.create()
+            except: pass
+
 
     def delete(self):
         for attribute in self.attributes:
@@ -74,8 +86,7 @@ class Schema(db.Model):
             if table.name in db.metadata.tables:
                 table.metadata.remove(table)
             table.metadata.bind = db.engine
-            if not table.exists():
-                table.create()
+            self.migrate()
         return self._cls
 
     @property
@@ -112,7 +123,7 @@ class Schema(db.Model):
 
         # set up the specific attributes:
         for attribute in self.attributes:
-            cls[attribute.name] = db.Column(attribute.column_type)
+            cls[attribute.name] = attribute.column
 
         # make an as_dict method:
         def as_dict(ins):
@@ -186,9 +197,10 @@ class Attribute(db.Model):
             }
 
     @property
-    def column_type(self):
+    def column(self):
         # TODO: do we also need some typecasting mechanism?
-        return ATTRIBUTE_TYPES_DB[self.type]
+        type_ = ATTRIBUTE_TYPES_DB[self.type]
+        return db.Column(self.name, type_)
 
     def __repr__(self):
         return "<Attribute(%s,%s)>" % (self.id, self.name)

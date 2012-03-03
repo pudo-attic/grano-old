@@ -11,6 +11,15 @@ NETWORK_FIXTURE = {'title': 'The One Percent',
                    'slug': 'net',
                    'description': 'A very neat resource!'}
 
+ENTITY_FIXTURE = {'title': 'Winnie Pooh', 
+                  'type': 'person',
+                  'network': 'net',
+                  'birth_day': '2011-01-01',
+                  'birth_place': 'The Tree',
+                  'death_day': '2012-01-01',
+                  'eye_color': 'Pink',
+                  'description': 'Entity of the year'}
+
 class SchemaAPITestCase(unittest.TestCase):
 
     def setUp(self):
@@ -60,7 +69,29 @@ class SchemaAPITestCase(unittest.TestCase):
         body2 = json.loads(res.data)
         assert body['label']==body2['label'], body2
 
-    
+    def test_update_add_attribute(self):
+        res = self.app.get('/api/1/net/schemata/entity/person')
+        body = json.loads(res.data)
+        body['attributes']['eye_color'] = {
+                'type': 'string',
+                'label': 'Eye Color',
+                'help': 'The person\' eye color.'
+            }
+        res = self.app.put('/api/1/net/schemata/entity/person',
+                data=json.dumps(body),
+                content_type='application/json',
+                follow_redirects=True)
+        res = self.app.get('/api/1/net/schemata/entity/person')
+        body2 = json.loads(res.data)
+        assert body['attributes']['eye_color']['type']=='string', \
+                body['attributes']
+        res = self.app.post('/api/1/net/entities',
+                      data=ENTITY_FIXTURE,
+                      follow_redirects=True)
+        body = json.loads(res.data)
+        assert body['eye_color']==ENTITY_FIXTURE['eye_color'], \
+                body
+
     def test_relation_schema_get(self):
         res = self.app.get('/api/1/net/schemata/relation/social')
         body = json.loads(res.data)
