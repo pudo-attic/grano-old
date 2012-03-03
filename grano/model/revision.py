@@ -1,11 +1,12 @@
 from grano.core import db
 from grano.model.util import make_serial
 
+
 class RevisionedMixIn(object):
     """ Simple versioning system for the database graph objects.
     This is based upon multiple objects sharing the smae ID, but
     differing in their serial number. Additionally, a ``current``
-    flag is used to flag that revision of a given edge or node 
+    flag is used to flag that revision of a given edge or node
     that should currently be used. """
 
     @classmethod
@@ -14,10 +15,10 @@ class RevisionedMixIn(object):
         obj = schema.cls()
         obj._update(schema, data)
         return obj
-    
+
     def update(self, schema, data, current=True):
-        """ Create a new object as a child of an existing, 
-        versioned object while changing the serial number to 
+        """ Create a new object as a child of an existing,
+        versioned object while changing the serial number to
         differentiate the child. """
         obj = schema.cls()
         obj.id = self.id
@@ -28,17 +29,17 @@ class RevisionedMixIn(object):
 
     def _update(self, schema, data, current=True):
         for attribute in schema.attributes:
-            setattr(self, attribute.name, 
+            setattr(self, attribute.name,
                 data.get(attribute.name))
         self.update_values(schema, data)
         self.serial = make_serial()
         self.type = schema.name
         if current:
-            # this is slightly hacky but it cannot 
+            # this is slightly hacky but it cannot
             # be assumed that the `current` version
             # is the parent object to the new obj.
             table = schema.parent_cls.__table__
-            q = table.update().where(table.c.id==self.id)
+            q = table.update().where(table.c.id == self.id)
             q = q.values({'current': False})
             db.session.execute(q)
             self.current = True
@@ -50,7 +51,7 @@ class RevisionedMixIn(object):
 
     def delete(self, schema):
         table = schema.parent_cls.__table__
-        q = table.update().where(table.c.id==self.id)
+        q = table.update().where(table.c.id == self.id)
         q = q.values({'current': False})
         db.session.execute(q)
 
@@ -75,6 +76,5 @@ class RevisionedMixIn(object):
         if network is not None:
             q = q.filter_by(network=network)
         return q
-
 
 

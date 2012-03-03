@@ -4,8 +4,9 @@ from grano.model import Network
 
 class ValidationContext(object):
 
-    def __init__(self, network=None):
+    def __init__(self, network=None, account=None):
         self.network = network
+        self.account = account
 
 
 class NetworkSchemaType(SchemaType):

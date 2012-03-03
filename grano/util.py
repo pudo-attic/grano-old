@@ -4,8 +4,10 @@ import json
 
 from sqlalchemy.orm.query import Query
 from werkzeug.exceptions import NotFound
+from formencode import htmlfill
 #from formencode.variabledecode import NestedVariables
 from flask import Response
+from flaskext.login import login_user, logout_user
 
 MIME_TYPES = {
         'text/html': 'html',
@@ -58,6 +60,13 @@ class JSONEncoder(json.JSONEncoder):
             return list(obj)
         raise TypeError("%r is not JSON serializable" % obj)
 
+def invalid_dict(exc):
+    """ Shift colander errors to only contain the relevan fields. """
+    out = {}
+    for child in exc.children:
+        out.update(child.asdict())
+    return out
+
 def jsonify(obj, status=200, headers=None):
     """ Custom JSONificaton to support obj.to_dict protocol. """
     return Response(json.dumps(obj, cls=JSONEncoder), headers=headers,
@@ -83,4 +92,12 @@ def response_format(app, request):
     neg = request.accept_mimetypes.best_match(MIME_TYPES.keys())
     return MIME_TYPES.get(neg)
 
+def error_fill(page, values, errors):
+    return htmlfill.render(page,
+            defaults=values,
+            errors=errors,
+            auto_error_formatter= \
+                lambda m: "<p class='error-message'>%s</p>" % m,
+            prefix_error=False,
+            force_defaults=False)
 

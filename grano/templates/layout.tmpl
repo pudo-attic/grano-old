@@ -1,26 +1,78 @@
-<html>
+
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>GRANO DEBUG</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css" />
+    <meta charset="utf-8">
+    <title>{% block title %}Untitled{% endblock %} - Grano SNA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+
+    <!-- Le styles -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="/static/css/grano.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/static/img/favicon.ico">
   </head>
+
   <body>
-    <div class="container">
-      {% block content %}
-        - No Content -
-      {% endblock %}
-      <ul id="network-list">
-      </ul>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="{{url_for('home.index')}}">Grano SNA</a>
+          <div class="nav-collapse">
+            <ul class="nav pull-right">
+              {% if current_user.is_anonymous() %}
+                <li><a href="{{url_for('account.login_form')}}">Login</a></li>
+                <li><a href="{{url_for('account.register_form')}}">Register</a></li>
+              {% else %}
+                <li><a>Hello, {{current_user.display_name}}</a></li>
+                <li><a href="{{url_for('account.logout')}}">Logout</a></li>
+              {% endif %}
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
     </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}
+            - No Content -
+        {% endblock %}
+    </div> <!-- /container -->
+
+    <!-- Le javascript
+    ================================================== -->
+    <script src="../assets/js/lib/jquery.js"></script>
+    <script src="../assets/js/lib/bootstrap.min.js"></script>
+    <script src="../assets/js/lib/underscore.min.js"></script>
+    <script src="../assets/js/lib/backbone.min.js"></script>
+    <script src="../assets/js/lib/backbone.min.js"></script>
+    <script src="../assets/js/app.js"></script>
+
   </body>
-
-  <script type="text/template" id="network-list-item">
-    <li><a href='#networks/<%= slug %>'><%= title %></a></li>
-  </script>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
-  <script src="http://documentcloud.github.com/backbone/backbone-min.js"></script>
-  <script src="/static/js/app.js"></script>
 </html>
 
 

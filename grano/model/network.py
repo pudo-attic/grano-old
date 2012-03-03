@@ -123,4 +123,3 @@ class Network(db.Model):
     def __repr__(self):
         return "<Network(%s,%s)>" % (self.id, self.slug)
 
-

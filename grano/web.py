@@ -1,9 +1,20 @@
 from flask import Response, request
 from colander import Invalid
 
-from grano.core import app
-from grano.util import response_format, jsonify
+from grano.model import Account
+from grano.core import app, current_user, login_manager
+from grano.util import response_format, jsonify, invalid_dict
 from grano.views import *
+
+
+@app.context_processor
+def set_template_context():
+    """ Set some template context globals. """
+    return dict(current_user=current_user)
+
+@login_manager.user_loader
+def load_account(name):
+    return Account.by_name(name)
 
 @app.errorhandler(401)
 @app.errorhandler(403)
@@ -28,7 +39,7 @@ def handle_validation_error(exc):
                 'description': unicode(exc),
                 'errors': exc.asdict()}
         return jsonify(body, status=400)
-    return Response(repr(exc.asdict()), status=400, 
+    return Response(repr(exc.as_dict()), status=400, 
                     mimetype='text/plain')
 
 

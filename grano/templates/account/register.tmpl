@@ -1,0 +1,66 @@
+{% extends "layout.tmpl" %}
+
+{% block title %}
+  Register
+{% endblock %}
+
+{% block content %}
+    <h2 class="page-header">Sign up.</h2>
+
+    <div class="row-fluid">
+        <div class="span3">
+            &nbsp;
+        </div>
+        <div class="span9">
+            <form class="form-horizontal" method="POST">
+                <div class="control-group">
+                    <label class="control-label" for="name">
+                        Username:
+                    </label>
+                    <div class="controls">
+                        <input type="text" id="name" name="name" class="input-xlarge">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="fullname">
+                        Full Name:
+                    </label>
+                    <div class="controls">
+                        <input type="text" id="fullname" name="fullname" class="input-xlarge">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="email">
+                        E-Mail Address:
+                    </label>
+                    <div class="controls">
+                        <input type="text" id="email" name="email" class="input-xlarge">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="password">
+                        Password:
+                    </label>
+                    <div class="controls">
+                        <input type="password" id="password" name="password" class="input-xlarge">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="password_repeat">
+                        Password <em>(repeat)</em>:
+                    </label>
+                    <div class="controls">
+                        <input type="password" id="password_repeat" name="password_repeat" class="input-xlarge">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Sign up</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+
