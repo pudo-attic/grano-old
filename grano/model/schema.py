@@ -61,8 +61,10 @@ class Schema(db.Model):
             if not attribute.name in remaining:
                 attribute.delete()
         db.session.flush()
+        self.migrate()
 
     def migrate(self):
+        self._make_cls()
         table = self._cls.__table__
         if not table.exists():
             table.create()
@@ -72,7 +74,6 @@ class Schema(db.Model):
                 col.create()
             except: pass
 
-
     def delete(self):
         for attribute in self.attributes:
             attribute.delete()
@@ -81,12 +82,7 @@ class Schema(db.Model):
     @property
     def cls(self):
         if not hasattr(self, '_cls'):
-            self._cls = self._make_cls()
-            table = self._cls.__table__
-            if table.name in db.metadata.tables:
-                table.metadata.remove(table)
-            table.metadata.bind = db.engine
-            self.migrate()
+            self._make_cls()
         return self._cls
 
     @property
@@ -120,6 +116,9 @@ class Schema(db.Model):
                     cls['id']==self.parent_cls.id,
                     cls['serial']==self.parent_cls.serial)
                 }
+        cls['__table_args__'] = {
+                'extend_existing': True
+                }
 
         # set up the specific attributes:
         for attribute in self.attributes:
@@ -134,7 +133,11 @@ class Schema(db.Model):
             return d
         cls['as_dict'] = as_dict
 
-        return type(str(self.name), (self.parent_cls,), cls)
+        self._cls = type(str(self.name), (self.parent_cls,), cls)
+        table = self._cls.__table__
+        if table.name in db.metadata.tables:
+            table.metadata.remove(table)
+        table.metadata.bind = db.engine
 
     def as_dict(self):
         attrs = [(a.name, a.as_dict()) for a in self.attributes]
