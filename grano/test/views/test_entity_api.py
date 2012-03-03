@@ -13,14 +13,15 @@ ENTITY_FIXTURE = {'title': 'Winnie Pooh',
                   'death_day': '2012-01-01',
                   'description': 'Entity of the year'}
 
+from grano.core import db
+from grano.model import Network, Schema
+from grano.test import helpers as h
 from grano.test.helpers import make_test_app, tear_down_test_app
-from grano.test.helpers import load_registry
 
 class EntityAPITestCase(unittest.TestCase):
 
     def setUp(self):
         self.app = make_test_app()
-        load_registry()
         self.make_fixtures()
 
     def tearDown(self):
@@ -29,72 +30,73 @@ class EntityAPITestCase(unittest.TestCase):
     def make_fixtures(self):
         self.app.post('/api/1/networks', 
                       data=NETWORK_FIXTURE)
-        res = self.app.post('/api/1/entities', 
+        network = Network.by_slug(NETWORK_FIXTURE['slug'])
+        Schema.create(network, Schema.RELATION,
+                      h.TEST_RELATION_SCHEMA)
+        Schema.create(network, Schema.ENTITY,
+                      h.TEST_ENTITY_SCHEMA)
+        db.session.commit()
+        res = self.app.post('/api/1/net/entities', 
                       data=ENTITY_FIXTURE, 
                       follow_redirects=True)
         body = json.loads(res.data)
         self.id = body['id']
 
     def test_network_index(self):
-        res = self.app.get('/api/1/networks/net/entities')
+        res = self.app.get('/api/1/net/entities')
         body = json.loads(res.data)
         assert len(body)==1, body
     
-    def test_index(self):
-        res = self.app.get('/api/1/entities')
-        body = json.loads(res.data)
-        assert len(body)==1, body
-
     def test_get(self):
-        res = self.app.get('/api/1/entities/%s' % self.id)
+        res = self.app.get('/api/1/net/entities/%s' % self.id)
         body = json.loads(res.data)
         assert body['title']==ENTITY_FIXTURE['title'], body
     
     def test_get(self):
-        res = self.app.get('/api/1/entities/%s/history' % self.id)
+        res = self.app.get('/api/1/net/entities/%s/history' % self.id)
         body = json.loads(res.data)
         assert len(body)==1,body
 
     def test_get_non_existent(self):
-        res = self.app.get('/api/1/entities/bonobo')
+        res = self.app.get('/api/1/net/entities/bonobo')
         assert res.status_code==404,res.status_code
 
     def test_entity_create(self):
         data = deepcopy(ENTITY_FIXTURE)
         data['title'] = 'Tigger'
-        res = self.app.post('/api/1/entities', data=data,
+        res = self.app.post('/api/1/net/entities', data=data,
                       follow_redirects=True)
         body = json.loads(res.data)
         assert body['title']==data['title'], body
 
     def test_entity_create_invalid(self):
         data = {'description': 'no'}
-        res = self.app.post('/api/1/entities', data=data,
+        res = self.app.post('/api/1/net/entities', data=data,
                       follow_redirects=True)
         assert res.status_code==400,res.status_code
     
     def test_update(self):
-        res = self.app.get('/api/1/entities/%s' % self.id)
+        res = self.app.get('/api/1/net/entities/%s' % self.id)
         body = json.loads(res.data)
         t = 'A banana'
         body['title'] = t
-        res = self.app.put('/api/1/entities/%s' % self.id, data=body)
+        res = self.app.put('/api/1/net/entities/%s' % self.id, data=body)
         assert res.status_code==200,res.status_code
         body = json.loads(res.data)
         assert body['title']==t, body
         
-        res = self.app.get('/api/1/entities/%s/history' % self.id)
+        res = self.app.get('/api/1/net/entities/%s/history' % self.id)
         body = json.loads(res.data)
         assert len(body)==2,body
 
     def test_entity_delete_nonexistent(self):
-        res = self.app.delete('/api/1/networks/the-one')
+        res = self.app.delete('/api/1/net/entities/the-one')
         assert res.status_code==404,res.status_code
 
     def test_entity_delete(self):
-        res = self.app.delete('/api/1/entities/%s' % self.id)
+        res = self.app.delete('/api/1/net/entities/%s' % self.id)
         assert res.status_code==410,res.status_code
-        res = self.app.get('/api/1/entities/%s' % self.id)
+        res = self.app.get('/api/1/net/entities/%s' % self.id)
         assert res.status_code==404,res.status_code
 
 

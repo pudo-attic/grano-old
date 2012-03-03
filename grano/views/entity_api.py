@@ -1,7 +1,6 @@
 from flask import Blueprint, request, redirect, url_for
 
 from grano.core import db
-from grano.model import Entity, schema_registry
 from grano.validation import validate_entity, ValidationContext
 from grano.views.network_api import _get_network
 from grano.util import request_content, jsonify
@@ -9,74 +8,70 @@ from grano.exc import Gone, NotFound, BadRequest
 
 api = Blueprint('entity_api', __name__)
 
-def _get_schema(type_):
-    try:
-        return schema_registry.get(Entity, type_)
-    except KeyError:
+def _get_schema(network, type_):
+    schema = network.get_entity_schema(type_)
+    if schema is None:
         raise BadRequest('No schema for type: %s' % type_)
+    return schema
 
-def _get_entity(id):
-    entity = Entity.current_by_id(id)
+def _get_entity(slug, id):
+    network = _get_network(slug)
+    entity = network.Entity.current_by_id(id)
     if entity is None:
         raise NotFound('No such entity: %s' % id)
-    return entity
+    return network, entity
 
-@api.route('/entities', methods=['GET'])
-def index():
+@api.route('/<slug>/entities', methods=['GET'])
+def index(slug):
     """ List all available entities. """
-    ids = [e.id for e in Entity.all()]
-    return jsonify(ids)
-
-@api.route('/networks/<slug>/entities', methods=['GET'])
-def network_index(slug):
-    """ List all available entities in the given network. """
     network = _get_network(slug)
-    ids = [e.id for e in Entity.all(network=network)]
+    ids = [e.id for e in network.Entity.all()]
     return jsonify(ids)
 
-@api.route('/entities', methods=['POST'])
-def create():
+@api.route('/<slug>/entities', methods=['POST'])
+def create(slug):
     """ Create a new entity. """
+    network = _get_network(slug)
     data = request_content(request)
-    context = ValidationContext()
-    schema = _get_schema(data.get('type'))
-    data = validate_entity(dict(data.items()), 
+    context = ValidationContext(network=network)
+    schema = _get_schema(network, data.get('type'))
+    data = validate_entity(dict(data.items()),
             schema, context)
-    entity = Entity.create(schema, data)
+    entity = network.Entity.create(schema, data)
     db.session.commit()
-    return redirect(url_for('.get', slug=entity.network.slug, 
+    return redirect(url_for('.get', slug=network.slug, 
                             id=entity.id))
 
-@api.route('/entities/<id>', methods=['GET'])
-def get(id):
+@api.route('/<slug>/entities/<id>', methods=['GET'])
+def get(slug, id):
     """ Get a JSON representation of the entity. """
-    entity = _get_entity(id)
+    network, entity = _get_entity(slug, id)
     return jsonify(entity)
 
-@api.route('/entities/<id>/history', methods=['GET'])
-def history(id):
+@api.route('/<slug>/entities/<id>/history', methods=['GET'])
+def history(slug, id):
     """ Get a JSON representation of the entity's revision history. """
-    entity = _get_entity(id)
+    network, entity = _get_entity(slug, id)
     return jsonify(entity.history)
 
-@api.route('/entities/<id>', methods=['PUT'])
-def update(id):
+@api.route('/<slug>/entities/<id>', methods=['PUT'])
+def update(slug, id):
     """ Update the data of the entity. """
-    entity = _get_entity(id)
+    network, entity = _get_entity(slug, id)
     data = dict(request_content(request).items())
     data['type'] = entity.type
-    context = ValidationContext(network=entity.network)
-    schema = _get_schema(data.get('type'))
+    context = ValidationContext(network=network)
+    schema = _get_schema(network, data.get('type'))
     data = validate_entity(data, schema, context)
     updated_entity = entity.update(schema, data)
     db.session.commit()
     return jsonify(updated_entity)
 
-@api.route('/entities/<id>', methods=['DELETE'])
-def delete(id):
+@api.route('/<slug>/entities/<id>', methods=['DELETE'])
+def delete(slug, id):
     """ Delete the entity (or at least flag it invisible). """
-    entity = _get_entity(id)
-    schema = _get_schema(entity.type)
+    network, entity = _get_entity(slug, id)
+    schema = _get_schema(network, entity.type)
     entity.delete(schema)
     db.session.commit()
     raise Gone('Successfully deleted: %s' % id)

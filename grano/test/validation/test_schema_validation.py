@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from colander import Invalid, DateTime
 
-from grano.model import Entity, Schema
+from grano.model import Schema, Network
 from grano.test import helpers as h
 
 from grano.validation.schema import validate_schema, apply_schema
@@ -14,6 +14,7 @@ class TestSchemaValidation(unittest.TestCase):
 
     def setUp(self):
         self.client = h.make_test_app()
+        self.network = Network.create({'title': 'Net', 'slug': 'net'})
 
     def tearDown(self):
         h.tear_down_test_app()
@@ -71,6 +72,6 @@ class TestSchemaValidation(unittest.TestCase):
 
     def test_apply_schema(self):
         base = mapping('entity')
-        schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
+        schema = Schema.create(self.network, Schema.ENTITY, h.TEST_ENTITY_SCHEMA)
         base = apply_schema(base, schema)
         assert len(base.children)==len(h.TEST_ENTITY_SCHEMA['attributes'])

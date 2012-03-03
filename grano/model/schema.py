@@ -1,6 +1,8 @@
 import colander
+from datetime import datetime
 
 from grano.core import db
+
 
 ATTRIBUTE_TYPES_DB = {
     'string': db.Unicode,
@@ -9,13 +11,8 @@ ATTRIBUTE_TYPES_DB = {
     'date': db.DateTime
     }
 
-class SchemaSet(dict):
-    
-    def add(self, schema):
-        self[schema.name] = schema
 
-
-class Schema(object):
+class Schema(db.Model):
     """ A schema defines a specific subtype of either an entity or a relation.
     This can mean any graph element, such as a person, company or other actor
     type for entities - or a type of social, economic or political link for a 
@@ -24,20 +21,54 @@ class Schema(object):
     A schema is defined through a model structure that contains necessary 
     metadata to handle the schema both internally and via the user interface.
     """
+    __tablename__ = 'schema'
 
-    def __init__(self, parent_cls, data):
-        self.data = data
-        self.parent_cls = parent_cls
-        self.name = str(data['name'])
-        self.label = data['label']
-        self.attributes = []
-        self._cls = None
-        for name, adata in data['attributes'].items():
-            self.attributes.append(Attribute(name, adata))
+    ENTITY = 'entity'
+    RELATION = 'relation'
+    TYPES = [ENTITY, RELATION]
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Unicode)
+    label = db.Column(db.Unicode)
+    entity = db.Column(db.Unicode)
+
+    network_id = db.Column(db.Integer, db.ForeignKey('network.id'))
+    network = db.relationship('Network',
+        backref=db.backref('schemata', lazy='dynamic'))
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    @classmethod
+    def create(cls, network, entity, data):
+        obj = cls()
+        obj.update(network, entity, data)
+        return obj
+
+    def update(self, network, entity, data):
+        self.network = network
+        self.name = str(data.get('name'))
+        self.label = data.get('label')
+        self.entity = entity
+        db.session.add(self)
+        db.session.flush()
+        remaining = []
+        for name, data in data.get('attributes', {}).items():
+            remaining.append(name)
+            self.attributes.append(Attribute.create(name, data))
+        for attribute in self.attributes:
+            if not attribute.name in remaining:
+                attribute.delete()
+        db.session.flush()
+
+    def delete(self):
+        for attribute in self.attributes:
+            attribute.delete()
+        db.session.delete(self)
 
     @property
     def cls(self):
-        if self._cls is None:
+        if not hasattr(self, '_cls'):
             self._cls = self._make_cls()
             table = self._cls.__table__
             if table.name in db.metadata.tables:
@@ -46,6 +77,14 @@ class Schema(object):
             if not table.exists():
                 table.create()
         return self._cls
+
+    @property
+    def parent_cls(self):
+        return {
+            self.ENTITY: self.network.Entity,
+            self.RELATION: self.network.Relation,
+            }.get(self.entity)
+
 
     def _make_cls(self):
         """ Generate a new type, mapped through SQLAlchemy. This will be a 
@@ -56,7 +95,7 @@ class Schema(object):
 
         # inherit primary key:
         cls = {
-            '__tablename__': prefix + '_' + self.name,
+            '__tablename__': prefix + '__' + self.name,
             'id': db.Column(db.String(36), db.ForeignKey(prefix + '.id'),
                 primary_key=True),
             'serial': db.Column(db.Integer, db.ForeignKey(prefix + '.serial'),
@@ -84,28 +123,75 @@ class Schema(object):
             return d
         cls['as_dict'] = as_dict
 
-        return type(self.name, (self.parent_cls,), cls)
+        return type(str(self.name), (self.parent_cls,), cls)
 
     def as_dict(self):
-        return self.data
+        attrs = [(a.name, a.as_dict()) for a in self.attributes]
+        return {
+            'id': self.id,
+            'name': self.name,
+            'label': self.label,
+            'entity': self.entity,
+            'attributes': dict(attrs)
+            }
 
-class Attribute(object):
+    def __repr__(self):
+        return "<Schema(%s,%s)>" % (self.id, self.name)
+
+
+class Attribute(db.Model):
     """ Attributes are specific properties of a schema for either an entity or 
     a relation. They materialize as columns on the joined sub-table for the 
     schema. """
+    __tablename__ = 'schema_attribute'
 
-    def __init__(self, name, data):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.Unicode)
+    label = db.Column(db.Unicode)
+    type = db.Column(db.Unicode)
+    help = db.Column(db.Unicode)
+    missing = db.Column(db.Unicode)
+
+    schema_id = db.Column(db.Integer, db.ForeignKey('schema.id'))
+    schema = db.relationship(Schema,
+        backref=db.backref('attributes', lazy='dynamic'))
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    @classmethod
+    def create(cls, name, data):
+        obj = cls()
+        obj.update(name, data)
+        return obj
+
+    def update(self, name, data):
         self.name = name
-        self.type = data['type']
-        self.label = data['label']
+        self.label = data.get('label')
+        self.type = data.get('type')
         self.help = data.get('help')
-        if 'missing' in data:
-            self.missing = data.get('missing')
-        else:
-            self.missing = colander.required
+        self.missing = data.get('missing')
+        db.session.add(self)
+        db.session.flush()
+
+    def delete(self):
+        db.session.delete(self)
+
+    def as_dict(self):
+        return {
+            'label': self.label,
+            'type': self.type,
+            'help': self.help,
+            'missing': self.missing
+            }
 
     @property
     def column_type(self):
         # TODO: do we also need some typecasting mechanism?
         return ATTRIBUTE_TYPES_DB[self.type]
+
+    def __repr__(self):
+        return "<Attribute(%s,%s)>" % (self.id, self.name)
+
+
 

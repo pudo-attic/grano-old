@@ -32,13 +32,13 @@ def create():
     db.session.commit()
     return redirect(url_for('.get', slug=network.slug))
 
-@api.route('/networks/<slug>', methods=['GET'])
+@api.route('/<slug>', methods=['GET'])
 def get(slug):
     """ Get a JSON representation of the network. """
     network = _get_network(slug)
     return jsonify(network)
 
-@api.route('/networks/<slug>', methods=['PUT'])
+@api.route('/<slug>', methods=['PUT'])
 def update(slug):
     """ Update the data of the network. """
     network = _get_network(slug)
@@ -50,7 +50,7 @@ def update(slug):
     db.session.commit()
     return jsonify(network)
 
-@api.route('/networks/<slug>', methods=['DELETE'])
+@api.route('/<slug>', methods=['DELETE'])
 def delete(slug):
     """ Delete the resource. """
     network = _get_network(slug)

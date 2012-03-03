@@ -132,6 +132,13 @@ Questions:
 * Is the graph name spaced by network?
 * Are slugs constant?
 
+**Where does the schema live?**
+
+Options: 
+
+* In the database, associated with the network to which it belongs
+* On disk, in a namespaced folder.
+
 **How does versioning work?**
 
 Entities and relations - the nodes and edges of the graph - are

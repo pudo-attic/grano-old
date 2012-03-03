@@ -5,11 +5,12 @@ from copy import deepcopy
 
 from colander import Invalid
 
-from grano.model import Schema, Entity, Network
+from grano.model import Schema, Network
 from grano.core import db
 from grano.test import helpers as h
 from grano.validation.entity import validate_entity
 from grano.validation.types import ValidationContext
+
 
 TEST_ENTITY = {
     'title': 'Test Person',
@@ -21,15 +22,14 @@ TEST_ENTITY = {
     'birth_place': 'Utopia'
     }
 
+
 class TestEntityValidation(unittest.TestCase):
 
     def setUp(self):
         self.client = h.make_test_app()
-        self.schema = Schema(Entity, h.TEST_ENTITY_SCHEMA)
-        self.network = Network()
-        self.network.title = 'Net'
-        self.network.slug = 'net'
-        db.session.add(self.network)
+        self.network = Network.create({'title': 'Net', 'slug': 'net'})
+        self.schema = Schema.create(self.network, Schema.ENTITY,
+                                    h.TEST_ENTITY_SCHEMA)
         db.session.commit()
         self.context = ValidationContext(network=self.network)
 
@@ -47,17 +47,11 @@ class TestEntityValidation(unittest.TestCase):
         in_ = deepcopy(TEST_ENTITY)
         del in_['title']
         validate_entity(in_, self.schema, self.context)
-        
+
     @h.raises(Invalid)
     def test_invalid_type(self):
         in_ = deepcopy(TEST_ENTITY)
         in_['type'] = 'animal'
-        validate_entity(in_, self.schema, self.context)
-
-    @h.raises(Invalid)
-    def test_no_schema_attribute(self):
-        in_ = deepcopy(TEST_ENTITY)
-        del in_['birth_place']
         validate_entity(in_, self.schema, self.context)
 
     @h.raises(Invalid)

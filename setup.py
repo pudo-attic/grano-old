@@ -26,8 +26,9 @@ setup(
         'Flask-Script==0.3.1',
         'flask-sqlalchemy==0.15',
         'colander==0.9.4',
-        'Unidecode==0.04.9'
-        'sqlalchemy-migrate==0.7.2'
+        'Unidecode==0.04.9',
+        'sqlalchemy-migrate==0.7.2',
+        'python-dateutil=2.0'
     ],
     tests_require=[],
     entry_points=\

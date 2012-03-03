@@ -1,10 +1,13 @@
 from datetime import datetime
 
 from grano.core import db
-from grano.model import util
+from grano.model.types import make_types
+from grano.model.schema import Schema
+
 
 class Network(db.Model):
     __tablename__ = 'network'
+
     id = db.Column(db.Integer, primary_key=True)
     slug = db.Column(db.Unicode)
     title = db.Column(db.Unicode)
@@ -15,6 +18,34 @@ class Network(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
     deleted_at = db.Column(db.DateTime)
 
+    def _ensure_types(self):
+        if not hasattr(self, '_Entity'):
+            self._Entity, self._Relation = make_types(self)
+
+    @db.reconstructor
+    def reconstruct(self):
+        # map these into the ORM
+        [rs.cls for rs in self.relation_schemata]
+        [es.cls for es in self.entity_schemata]
+
+    @property
+    def Entity(self):
+        self._ensure_types()
+        return self._Entity
+
+    @property
+    def Relation(self):
+        self._ensure_types()
+        return self._Relation
+
+    @property
+    def all_entities(self):
+        return db.query(self.Entity)
+
+    @property
+    def all_relations(self):
+        return db.query(self.Relation)
+
     @property
     def entities(self):
         return self.all_entities.filter_by(current=True)
@@ -22,11 +53,29 @@ class Network(db.Model):
     @property
     def relations(self):
         return self.all_relations.filter_by(current=True)
-    
+
+    @property
+    def entity_schemata(self):
+        return self.schemata.filter_by(entity=Schema.ENTITY)
+
+    def get_entity_schema(self, name):
+        return self.entity_schemata.filter_by(name=name).first()
+
+    @property
+    def relation_schemata(self):
+        return self.schemata.filter_by(entity=Schema.RELATION)
+
+    def get_relation_schema(self, name):
+        return self.relation_schemata.filter_by(name=name).first()
+
     @classmethod
     def create(cls, data):
         obj = cls()
         obj.update(data)
+        if not obj.Entity.__table__.exists(db.session.bind):
+            obj.Entity.__table__.create(db.session.bind)
+        if not obj.Relation.__table__.exists(db.session.bind):
+            obj.Relation.__table__.create(db.session.bind)
         return obj
 
     def update(self, data):
@@ -47,8 +96,8 @@ class Network(db.Model):
             'description': self.description,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'num_entities': self.entities.count(),
-            'num_relations': self.relations.count(),
+            #'num_entities': self.entities.count(),
+            #'num_relations': self.relations.count(),
             }
 
     @classmethod

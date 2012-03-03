@@ -1,9 +1,9 @@
 from grano.core import app, db
 from grano import core, web
-from grano.model import schema_registry
 
 from nose.tools import *
 from nose.plugins.skip import SkipTest
+
 
 TEST_ENTITY_SCHEMA = {
     'name': 'person',
@@ -19,17 +19,17 @@ TEST_ENTITY_SCHEMA = {
             'label': 'Death Day',
             'help': 'The day the person died.'
             },
-        'birth_place': {
-            'type': 'string',
-            'label': 'Birth Place',
-            'help': 'The place of birth.'
-            },
         'shoe_size': {
             'type': 'integer',
             'label': 'Shoe Size',
             'help': 'European shoe size',
             'missing': 40
-            }
+            },
+        'birth_place': {
+            'type': 'string',
+            'label': 'Birth Place',
+            'help': 'The place of birth.'
+            },
         },
     }
 
@@ -44,20 +44,16 @@ TEST_RELATION_SCHEMA = {
         }
     }
 
-TEST_SCHEMA = {'entity': [TEST_ENTITY_SCHEMA], 'relation': [TEST_RELATION_SCHEMA]}
-
 def skip(*args, **kwargs):
     raise SkipTest(*args, **kwargs)
 
 def make_test_app(use_cookies=False):
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    #import ipdb; ipdb.set_trace()
+    from grano.model import *
     db.create_all()
     return app.test_client(use_cookies=use_cookies)
-
-def load_registry():
-    from grano.validation.schema_loader import SchemaLoader
-    SchemaLoader.load_data(schema_registry, TEST_SCHEMA)
 
 def tear_down_test_app():
     db.session.rollback()

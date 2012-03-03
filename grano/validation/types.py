@@ -1,6 +1,6 @@
 from colander import SchemaType, Invalid, null
 
-from grano.model import Network, Entity
+from grano.model import Network
 
 class ValidationContext(object):
 
@@ -9,7 +9,7 @@ class ValidationContext(object):
 
 
 class NetworkSchemaType(SchemaType):
-    
+
     def __init__(self, context):
         self.context = context
 
@@ -24,7 +24,7 @@ class NetworkSchemaType(SchemaType):
         if obj is None:
             raise Invalid(node, "No such network: %r")
         if self.context.network and obj.id != self.context.network.id:
-            raise Invalid(node, "%r is not the current network.")
+            raise Invalid(node, "%r is not the current network." % obj)
         return obj
 
 
@@ -41,10 +41,8 @@ class EntitySchemaType(SchemaType):
         id = cstruct.get('id') if isinstance(cstruct, dict) else cstruct
         if id is null or id is None:
             raise Invalid(node, "No network specified")
-        obj = Entity.current_by_id(id)
+        obj = self.context.network.Entity.current_by_id(id)
         if obj is None:
             raise Invalid(node, "No such entity: %r")
-        if self.context.network and obj.network_id != self.context.network.id:
-            raise Invalid(node, "%r is not the current network.")
         return obj
 
