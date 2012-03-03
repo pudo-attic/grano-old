@@ -28,7 +28,9 @@ setup(
         'colander==0.9.4',
         'Unidecode==0.04.9',
         'sqlalchemy-migrate==0.7.2',
-        'python-dateutil=2.0'
+        'python-dateutil=2.0',
+        'flask-login==0.1',
+        'formencode=1.2.4'
     ],
     tests_require=[],
     entry_points=\
