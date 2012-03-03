@@ -12,9 +12,11 @@ def set_template_context():
     """ Set some template context globals. """
     return dict(current_user=current_user)
 
+
 @login_manager.user_loader
 def load_account(name):
     return Account.by_name(name)
+
 
 @app.errorhandler(401)
 @app.errorhandler(403)
@@ -32,6 +34,7 @@ def handle_exceptions(exc):
                        headers=exc.get_headers(request.environ))
     return exc
 
+
 @app.errorhandler(Invalid)
 def handle_validation_error(exc):
     if 'json' == response_format(app, request):
@@ -39,7 +42,7 @@ def handle_validation_error(exc):
                 'description': unicode(exc),
                 'errors': exc.asdict()}
         return jsonify(body, status=400)
-    return Response(repr(exc.as_dict()), status=400, 
+    return Response(repr(exc.asdict()), status=400,
                     mimetype='text/plain')
 
 

@@ -1,6 +1,4 @@
-
-import grano.auth.network as network_auth
-# TODO: Make sense.
+import network as network_auth
 
 
 def list(network):
@@ -8,7 +6,7 @@ def list(network):
 
 
 def create(network):
-    return network_auth.edit(network)
+    return network_auth.update(network)
 
 
 def read(network, entity):
@@ -16,8 +14,8 @@ def read(network, entity):
 
 
 def update(network, entity):
-    return network_auth.edit(network)
+    return network_auth.update(network)
 
 
 def delete(network, entity):
-    return network_auth.edit(network)
+    return network_auth.update(network)

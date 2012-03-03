@@ -9,13 +9,13 @@ def create(network):
     return network_auth.update(network)
 
 
-def read(network, relation):
+def read(network, schema):
     return network_auth.read(network)
 
 
-def update(network, relation):
+def update(network, schema):
     return network_auth.update(network)
 
 
-def delete(network, relation):
+def delete(network, schema):
     return network_auth.update(network)
