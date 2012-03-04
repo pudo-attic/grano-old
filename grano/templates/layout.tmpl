@@ -57,21 +57,59 @@
             {% endfor %}
           {% endif %}
         {% endwith %}
+        <div id="flash-notices"></div>
 
-        {% block content %}
-            - No Content -
-        {% endblock %}
+        <div id="app">
+          {% block content %}
+              - No Content -
+          {% endblock %}
+        </div>
     </div> <!-- /container -->
 
     <!-- Le javascript
     ================================================== -->
-    <script src="../assets/js/lib/jquery.js"></script>
-    <script src="../assets/js/lib/bootstrap.min.js"></script>
-    <script src="../assets/js/lib/underscore.min.js"></script>
-    <script src="../assets/js/lib/backbone.min.js"></script>
-    <script src="../assets/js/lib/backbone.min.js"></script>
-    <script src="../assets/js/app.js"></script>
+    <script src="/static/js/lib/jquery.min.js"></script>
+    <script src="/static/js/lib/bootstrap.min.js"></script>
+    <script src="/static/js/lib/underscore.min.js"></script>
+    <script src="/static/js/lib/backbone.min.js"></script>
+    <script src="/static/js/lib/handlebars.js"></script>
 
+    <script type="text/x-handlebars-template" id="network-edit">
+      {%raw%}
+      <h1 class="page-header">Make a network</h1>
+
+      <form class="form-horizontal">
+        <div class="control-group">
+          <label class="control-label" for="title">
+            Title:
+          </label>
+          <div class="controls">
+            <input type="text" id="title" name="title" class="input-xlarge" value="{{title}}">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label" for="description">
+            Description:
+          </label>
+          <div class="controls">
+            <textarea type="text" id="desc" name="description" class="input-xlarge">{{description}}</textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+      {%endraw%}
+    </script>
+
+    <script src="/static/js/app.js"></script>
+
+    <script>
+      $(function() {
+        new Grano.App();
+        Backbone.history.start();
+      });
+    </script>
   </body>
 </html>
 
