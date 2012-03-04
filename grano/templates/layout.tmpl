@@ -33,6 +33,17 @@
           </a>
           <a class="brand" href="{{url_for('home.index')}}">Grano SNA</a>
           <div class="nav-collapse">
+            <ul class="nav">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  Networks <b class="caret"></b></a>
+                <ul class="dropdown-menu" id="network-list-elem">
+                  
+                </ul>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+          <div class="nav-collapse">
             <ul class="nav pull-right">
               {% if current_user.is_anonymous() %}
                 <li><a href="{{url_for('account.login_form')}}">Login</a></li>
@@ -102,11 +113,28 @@
       {%endraw%}
     </script>
 
+    <script type="text/x-handlebars-template" id="network-list">
+      {%raw%}
+        {{#networks}}
+          <li><a href="#{{slug}}">{{title}}</a></li>
+        {{/networks}}
+        <li class="divider"></li>
+        <li><a id="network-new">New network...</a></li>
+      {%endraw%}
+    </script>
+
+    <script type="text/x-handlebars-template" id="network-view">
+      {%raw%}
+        <h1>{{title}}</h1>
+        <a id="edit-network">Edit</a>
+      {%endraw%}
+    </script>
+
     <script src="/static/js/app.js"></script>
 
     <script>
       $(function() {
-        new Grano.App();
+        window.app = new Grano.App();
         Backbone.history.start();
       });
     </script>

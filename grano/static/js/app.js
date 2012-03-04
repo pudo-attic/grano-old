@@ -32,6 +32,36 @@ my.Models.Network = Backbone.Model.extend({
   }
 });
 
+my.Collections.Networks = Backbone.Collection.extend({
+  model: my.Models.Network,
+  initialize: function() {},
+  url : function() {
+    return my.Config.ApiEndpoint + 'networks';
+  }
+});
+
+my.Views.Network = Backbone.View.extend({
+  events: {
+    "click #edit-network": "edit"
+  },
+
+  template: Handlebars.compile($("#network-view").html()),
+
+  initialize: function() {
+    this.render();
+  },
+
+  edit: function() {
+    window.app.navigate(this.model.id + "/edit", {trigger: true});
+  },
+
+  render: function() {
+    var html = this.template(this.model.toJSON());
+    $(this.el).html(html);
+    $('#app').html(this.el);
+  }  
+
+});
 
 my.Views.NetworkEdit = Backbone.View.extend({
   events: {
@@ -45,12 +75,12 @@ my.Views.NetworkEdit = Backbone.View.extend({
 
   save: function() {
     var data = $(this.el).find("form").serializeObject();
-    console.log(data);
     this.model.save(data, {
-      success: function(model, resp) {},
-      error: function(model, resp) {
-        console.log(resp);
-      }
+      success: function(model, resp) {
+        window.app.networksView.update();
+        window.app.navigate(model.id, {trigger: true});
+      },
+      error: function(model, resp) {}
     });
     return false;
   },
@@ -63,28 +93,78 @@ my.Views.NetworkEdit = Backbone.View.extend({
 
 });
 
+my.Views.NetworkList = Backbone.View.extend({
+  events: {
+      "click #network-new": "newNetwork"
+  },
+
+  template: Handlebars.compile($("#network-list").html()),
+
+  initialize: function() {
+  },
+
+  newNetwork: function() {
+    window.app.navigate('newNetwork', {trigger: true});
+  },
+
+  update: function() {
+    var self = this;
+    this.model.fetch({
+      success: function() {
+        self.render();
+      }
+    });
+  },
+
+  render: function() {
+    var data = {networks: this.model.toJSON()};
+    var html = this.template(data);
+    $(this.el).html(html);
+    $('#network-list-elem').html(this.el);
+  }  
+
+});
+
 my.App = Backbone.Router.extend({
 
   routes: {
-    "networks":              "listNetworks",
-    "networks/new":          "newNetwork",
-    "networks/:slug":        "viewNetwork"
+    "newNetworks":  "newNetwork",
+    ":slug":        "viewNetwork",
+    ":slug/edit":   "editNetwork"
   },
 
   initialize: function(options) {
     my.Config.ApiEndpoint = '/api/1/';
+    this.listNetworks();  
   },
 
   listNetworks: function() {
-    console.log("Banana!");
+    var self = this;
+    this.networks = new my.Collections.Networks();
+    this.networksView = new my.Views.NetworkList({model: this.networks});
+    this.networksView.update();
   },
 
   newNetwork: function() {
     new my.Views.NetworkEdit({ model: new my.Models.Network() });
   },
 
+  editNetwork: function(slug) {
+    var model = new my.Models.Network({slug: slug});
+    model.fetch({
+      success: function(model) {
+        new my.Views.NetworkEdit({ model: model });
+      }
+    }); 
+  },
+
   viewNetwork: function(slug) {
-    
+    var model = new my.Models.Network({slug: slug});
+    model.fetch({
+      success: function(model) {
+        new my.Views.Network({ model: model });
+      }
+    });
   }
 
 });
