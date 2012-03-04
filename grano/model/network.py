@@ -72,10 +72,15 @@ class Network(db.Model):
     def create(cls, data):
         obj = cls()
         obj.update(data)
-        if not obj.Entity.__table__.exists(db.session.bind):
-            obj.Entity.__table__.create(db.session.bind)
-        if not obj.Relation.__table__.exists(db.session.bind):
-            obj.Relation.__table__.create(db.session.bind)
+        #bind = db.session.bind
+        #bind = obj.__table__.bind
+        #bind = db.engine
+        #import ipdb; ipdb.set_trace()
+        #print bind
+        #if not obj.Entity.__table__.exists(bind):
+        #    obj.Entity.__table__.create(bind)
+        #if not obj.Relation.__table__.exists(bind):
+        #    obj.Relation.__table__.create(bind)
         return obj
 
     def update(self, data):

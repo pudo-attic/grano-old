@@ -65,6 +65,9 @@ class Schema(db.Model):
 
     def migrate(self):
         self._make_cls()
+        parent_table = self.parent_cls.__table__
+        if not parent_table.exists():
+            parent_table.create()
         table = self._cls.__table__
         if not table.exists():
             table.create()
@@ -72,7 +75,8 @@ class Schema(db.Model):
             try:
                 col = table.c[attribute.name]
                 col.create()
-            except: pass
+            except:
+                pass
 
     def delete(self):
         for attribute in self.attributes:
@@ -92,11 +96,10 @@ class Schema(db.Model):
             self.RELATION: self.network.Relation,
             }.get(self.entity)
 
-
     def _make_cls(self):
-        """ Generate a new type, mapped through SQLAlchemy. This will be a 
+        """ Generate a new type, mapped through SQLAlchemy. This will be a
         joined subtable to either an entity or a relation and retain a copy
-        of its composite primary key plus any attributes defined in the 
+        of its composite primary key plus any attributes defined in the
         schema. """
         prefix = self.parent_cls.__tablename__
 
@@ -113,8 +116,8 @@ class Schema(db.Model):
         cls['__mapper_args__'] = {
                 'polymorphic_identity': self.name,
                 'inherit_condition': db.and_(
-                    cls['id']==self.parent_cls.id,
-                    cls['serial']==self.parent_cls.serial)
+                    cls['id'] == self.parent_cls.id,
+                    cls['serial'] == self.parent_cls.serial)
                 }
         cls['__table_args__'] = {
                 'extend_existing': True
