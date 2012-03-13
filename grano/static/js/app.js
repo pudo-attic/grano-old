@@ -23,6 +23,16 @@ $.fn.serializeObject = function() {
   return o;
 };
 
+my.applyValidationErrors = function($el, resp) {
+  var data = JSON.parse(resp.responseText);
+  for (var field in data.errors) {
+    var elem = field.split('.', 2)[1];
+    var el = $($el).find("*[id='" + elem + "']");
+    el.parents(".control-group").addClass("error");
+    el.after("<span class='help-inline'>" + data.errors[field] + "</span>");
+  }
+};
+
 my.Models.Network = Backbone.Model.extend({
   idAttribute: 'slug',
   url : function() {
@@ -67,26 +77,35 @@ my.Views.NetworkEdit = Backbone.View.extend({
   events: {
       "submit form": "save"
   },
+
+  template: Handlebars.compile($("#network-edit").html()),
     
   initialize: function() {
-    this.template = Handlebars.compile($("#network-edit").html());
     this.render();
   },
 
   save: function() {
+    var self = this;
     var data = $(this.el).find("form").serializeObject();
+    if (!this.model.isNew()) {
+      data.slug = this.model.id;
+    }
     this.model.save(data, {
       success: function(model, resp) {
         window.app.networksView.update();
         window.app.navigate(model.id, {trigger: true});
       },
-      error: function(model, resp) {}
+      error: function(model, resp) {
+        my.applyValidationErrors(self.el, resp);
+      }
     });
     return false;
   },
   
   render: function() {
-    var html = this.template(this.model.toJSON());
+    var data = this.model.toJSON();
+    data.heading = this.model.isNew() ? 'Make a network' : data.title;
+    var html = this.template(data);
     $(this.el).html(html);
     $('#app').html(this.el);
   }  
@@ -94,17 +113,10 @@ my.Views.NetworkEdit = Backbone.View.extend({
 });
 
 my.Views.NetworkList = Backbone.View.extend({
-  events: {
-      "click #network-new": "newNetwork"
-  },
 
   template: Handlebars.compile($("#network-list").html()),
 
   initialize: function() {
-  },
-
-  newNetwork: function() {
-    window.app.navigate('newNetwork', {trigger: true});
   },
 
   update: function() {
@@ -128,7 +140,7 @@ my.Views.NetworkList = Backbone.View.extend({
 my.App = Backbone.Router.extend({
 
   routes: {
-    "newNetworks":  "newNetwork",
+    "newNetwork":  "newNetwork",
     ":slug":        "viewNetwork",
     ":slug/edit":   "editNetwork"
   },

@@ -87,7 +87,7 @@
 
     <script type="text/x-handlebars-template" id="network-edit">
       {%raw%}
-      <h1 class="page-header">Make a network</h1>
+      <h1 class="page-header">{{heading}}</h1>
 
       <form class="form-horizontal">
         <div class="control-group">
@@ -116,10 +116,10 @@
     <script type="text/x-handlebars-template" id="network-list">
       {%raw%}
         {{#networks}}
-          <li><a href="#{{slug}}">{{title}}</a></li>
+          <li><a href="/#{{slug}}">{{title}}</a></li>
         {{/networks}}
         <li class="divider"></li>
-        <li><a id="network-new">New network...</a></li>
+        <li><a href="/#newNetwork">New network...</a></li>
       {%endraw%}
     </script>
 
