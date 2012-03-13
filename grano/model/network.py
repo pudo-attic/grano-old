@@ -1,4 +1,5 @@
 from datetime import datetime
+from itertools import chain
 
 from grano.core import db
 from grano.model.types import make_types
@@ -105,6 +106,15 @@ class Network(db.Model):
             #'num_relations': self.relations.count(),
             }
 
+    def raw_query(self, query, *a, **kw):
+        conn = db.engine.connect()
+        true = db.Boolean().bind_processor(db.engine.dialect)(True)
+        for rs in chain(self.relation_schemata, self.entity_schemata):
+            q = rs.cls.view().replace("?", str(true))
+            conn.execute(q)
+        return conn.execute(query, *a, **kw)
+
+
     @classmethod
     def by_id(self, id):
         q = db.session.query(Network)
@@ -127,4 +137,3 @@ class Network(db.Model):
 
     def __repr__(self):
         return "<Network(%s,%s)>" % (self.id, self.slug)
-

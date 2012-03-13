@@ -7,6 +7,7 @@ from sqlalchemy.types import Text, MutableType, TypeDecorator
 
 SLUG_RE = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
+
 def slugify(text, delimiter='-'):
     '''\
     Generate an ascii only slug from the text that can be
@@ -21,8 +22,9 @@ def slugify(text, delimiter='-'):
 def make_id():
     return unicode(uuid4())
 
+
 def make_serial():
-    return int(time()*1000)
+    return int(time() * 1000)
 
 
 class JSONType(MutableType, TypeDecorator):
@@ -39,6 +41,3 @@ class JSONType(MutableType, TypeDecorator):
 
     def copy_value(self, value):
         return loads(dumps(value))
-
-
-

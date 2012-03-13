@@ -1,8 +1,31 @@
 from datetime import datetime
+from sqlalchemy.sql import select
 
 from grano.core import db
 from grano.model import util
 from grano.model.revision import RevisionedMixIn
+
+
+class ViewMixIn(object):
+
+    @classmethod
+    def view(cls):
+        """ Create a temporary view to simplify queries against the
+        data model. """
+        parent_cls = cls.__bases__[0]
+        parent_table = parent_cls.__table__
+        table = cls.__table__
+        view_name = '%s_%s' % (parent_cls.__name__.lower(),
+                               cls.__name__)
+        columns = table.columns + parent_table.columns
+        columns = [c for c in columns if c not in (table.c.id, table.c.serial)]
+        columns = [c.label(c.name) for c in columns]
+        q = select(columns,
+            db.and_(parent_table.c.id == table.c.id,
+                    parent_table.c.serial == table.c.serial,
+                    parent_table.c.current == True))
+        return 'CREATE TEMP VIEW %s AS %s' % (view_name, q)
+
 
 def make_types(network):
     relation_table_name = network.slug + '__relation'
@@ -11,12 +34,13 @@ def make_types(network):
 #    entity_table = db.metadata.tables.get(entity_table_name)
 #    relation_table = db.metadata.tables.get(relation_table_name)
 
-    class Entity(db.Model, RevisionedMixIn):
+    class Entity(db.Model, RevisionedMixIn, ViewMixIn):
         """ Node type, never really instantiated directly. """
 
         __tablename__ = entity_table_name
         id = db.Column(db.String(36), primary_key=True, default=util.make_id)
-        serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
+        serial = db.Column(db.Integer, primary_key=True,
+            default=util.make_serial)
         type = db.Column(db.Unicode)
 
         __mapper_args__ = {'polymorphic_on': type}
@@ -63,14 +87,14 @@ def make_types(network):
         def __repr__(self):
             return "<Entity:%s(%s,%s)>" % (self.type, self.id, self.slug)
 
-
-    class Relation(db.Model, RevisionedMixIn):
-        """ Edge data type. This is never instantiated directly, only through a 
+    class Relation(db.Model, RevisionedMixIn, ViewMixIn):
+        """ Edge data type. This is never instantiated directly, only through a
         schema definition which will create a joined subtype. """
 
         __tablename__ = relation_table_name
         id = db.Column(db.String(36), primary_key=True, default=util.make_id)
-        serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
+        serial = db.Column(db.Integer, primary_key=True,
+            default=util.make_serial)
         type = db.Column(db.Unicode)
 
         __mapper_args__ = {'polymorphic_on': type}
@@ -129,4 +153,3 @@ def make_types(network):
 #        Relation.__table__ = db.metadata.tables[Relation.__tablename__]
 
     return Entity, Relation
-
