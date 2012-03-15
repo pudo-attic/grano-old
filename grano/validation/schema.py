@@ -6,10 +6,12 @@ from grano.validation.util import reserved_name, database_name
 
 from grano.model.schema import ATTRIBUTE_TYPES_DB
 
-INVALID_NAMES = ['id', 'current', 'serial', 'title', 
-    'slug', 'type', 'incoming', 'outgoing', 'target', 'source', 
-    'target_id', 'source_id', 'network', 'network_id', 
+
+INVALID_NAMES = ['id', 'current', 'serial', 'title',
+    'slug', 'type', 'incoming', 'outgoing', 'target', 'source',
+    'target_id', 'source_id', 'network', 'network_id',
     'created_at']
+
 
 ATTRIBUTE_VALIDATORS = {
     'string': colander.String,
@@ -17,6 +19,7 @@ ATTRIBUTE_VALIDATORS = {
     'integer': colander.Integer,
     'date': colander.DateTime
     }
+
 
 def attribute_schema(name, meta):
     """ Validate the representation of a schema attribute. """
@@ -33,9 +36,10 @@ def attribute_schema(name, meta):
         )))
     return schema
 
+
 def validate_schema(data):
-    """ Validate a schema. This does not actually apply the 
-    schema to user data but checks for the integrity of its 
+    """ Validate a schema. This does not actually apply the
+    schema to user data but checks for the integrity of its
     specification. """
     schema = mapping('schema')
     schema.add(key('name', validator=chained(
@@ -58,7 +62,6 @@ def apply_schema(base, schema):
     schema. """
     for attribute in schema.attributes:
         validator = ATTRIBUTE_VALIDATORS[attribute.type]
-        base.add(_node(validator(), attribute.name, 
+        base.add(_node(validator(), attribute.name,
                  missing=attribute.missing))
     return base
-
