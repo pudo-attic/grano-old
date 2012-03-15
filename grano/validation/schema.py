@@ -17,7 +17,8 @@ ATTRIBUTE_VALIDATORS = {
     'string': colander.String,
     'float': colander.Float,
     'integer': colander.Integer,
-    'date': colander.DateTime
+    'date': colander.DateTime,
+    'boolean': colander.Boolean,
     }
 
 

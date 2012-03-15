@@ -11,17 +11,18 @@ ATTRIBUTE_TYPES_DB = {
     'string': db.Unicode,
     'float': db.Float,
     'integer': db.Integer,
-    'date': db.DateTime
+    'date': db.DateTime,
+    'boolean': db.Boolean
     }
 
 
 class Schema(db.Model):
     """ A schema defines a specific subtype of either an entity or a relation.
     This can mean any graph element, such as a person, company or other actor
-    type for entities - or a type of social, economic or political link for a 
+    type for entities - or a type of social, economic or political link for a
     relation (e.g. ownership, school attendance, ..).
 
-    A schema is defined through a model structure that contains necessary 
+    A schema is defined through a model structure that contains necessary
     metadata to handle the schema both internally and via the user interface.
     """
     __tablename__ = 'schema'
