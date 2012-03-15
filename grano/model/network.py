@@ -21,6 +21,7 @@ class Network(db.Model):
 
     def _ensure_types(self):
         if not hasattr(self, '_Entity'):
+            self.meta = db.metadata
             self._Entity, self._Relation = make_types(self)
 
     @db.reconstructor
@@ -73,15 +74,10 @@ class Network(db.Model):
     def create(cls, data):
         obj = cls()
         obj.update(data)
-        #bind = db.session.bind
-        #bind = obj.__table__.bind
-        #bind = db.engine
-        #import ipdb; ipdb.set_trace()
-        #print bind
-        #if not obj.Entity.__table__.exists(bind):
-        #    obj.Entity.__table__.create(bind)
-        #if not obj.Relation.__table__.exists(bind):
-        #    obj.Relation.__table__.create(bind)
+        if not obj.Entity.__table__.exists(db.engine):
+            obj.Entity.__table__.create(db.engine)
+        if not obj.Relation.__table__.exists(db.engine):
+            obj.Relation.__table__.create(db.engine)
         return obj
 
     def update(self, data):
@@ -113,7 +109,6 @@ class Network(db.Model):
             q = rs.cls.view().replace("?", str(true))
             conn.execute(q)
         return conn.execute(query, *a, **kw)
-
 
     @classmethod
     def by_id(self, id):

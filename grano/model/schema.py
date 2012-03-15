@@ -1,7 +1,10 @@
-import colander
+import logging
 from datetime import datetime
 
 from grano.core import db
+
+
+log = logging.getLogger(__name__)
 
 
 ATTRIBUTE_TYPES_DB = {
@@ -61,22 +64,23 @@ class Schema(db.Model):
             if not attribute.name in remaining:
                 attribute.delete()
         db.session.flush()
+        #db.session.commit()
         self.migrate()
 
     def migrate(self):
         self._make_cls()
-        parent_table = self.parent_cls.__table__
-        if not parent_table.exists():
-            parent_table.create()
         table = self._cls.__table__
-        if not table.exists():
-            table.create()
-        for attribute in self.attributes:
-            try:
-                col = table.c[attribute.name]
-                col.create()
-            except:
-                pass
+        if not table.exists(db.engine):
+            table.create(db.engine)
+        else:
+            table.metadata.bind = db.engine
+            for attribute in self.attributes:
+                try:
+                    col = table.c[attribute.name]
+                    col.create()
+                except Exception as e:
+                    #log.exception(e)
+                    pass
 
     def delete(self):
         for attribute in self.attributes:
@@ -106,10 +110,8 @@ class Schema(db.Model):
         # inherit primary key:
         cls = {
             '__tablename__': prefix + '__' + self.name,
-            'id': db.Column(db.String(36), db.ForeignKey(prefix + '.id'),
-                primary_key=True),
-            'serial': db.Column(db.Integer, db.ForeignKey(prefix + '.serial'),
-                primary_key=True)
+            'id': db.Column(db.String(36), primary_key=True),
+            'serial': db.Column(db.Integer, primary_key=True)
             }
 
         # set up inheritance:
@@ -137,10 +139,6 @@ class Schema(db.Model):
         cls['as_dict'] = as_dict
 
         self._cls = type(str(self.name), (self.parent_cls,), cls)
-        table = self._cls.__table__
-        if table.name in db.metadata.tables:
-            table.metadata.remove(table)
-        table.metadata.bind = db.engine
 
     def as_dict(self):
         attrs = [(a.name, a.as_dict()) for a in self.attributes]
@@ -210,6 +208,3 @@ class Attribute(db.Model):
 
     def __repr__(self):
         return "<Attribute(%s,%s)>" % (self.id, self.name)
-
-
-

@@ -3,6 +3,7 @@ import re
 from colander import SchemaNode, Function, String
 from colander import Mapping, Sequence
 
+
 def _node(schema, name, *children, **kw):
     if 'validator' in kw:
         kw['validator'] = Function(kw['validator'])
@@ -18,7 +19,7 @@ def mapping(name, unknown='preserve', **kw):
 
 
 def sequence(name, *children, **kw):
-    return _node(Sequence(), name, 
+    return _node(Sequence(), name,
                  *children, **kw)
 
 
@@ -27,10 +28,10 @@ def key(name, **kw):
 
 
 def chained(*validators):
-    """ 
-    Chain a list of predicates and raise an error on the first 
-    failure. This means only the first error is shown, so it 
-    makes sense to pass in predicates from the more general to 
+    """
+    Chain a list of predicates and raise an error on the first
+    failure. This means only the first error is shown, so it
+    makes sense to pass in predicates from the more general to
     the more specific.
     """
     def _validator(value):
@@ -54,7 +55,7 @@ def reserved_name(terms):
 
 
 def name_wrap(check, name):
-    """ Apply a validator to the name variable, not any of 
+    """ Apply a validator to the name variable, not any of
     the actual dimensions data. """
     def _check(value):
         return check(name)
@@ -76,11 +77,13 @@ def database_name(name):
                 "letters, numbers and underscores")
     return True
 
+
 def slug_name(name):
     if not re.match(r"^[\w\-\_]+$", name):
         return ("Name must include only "
                 "letters, numbers and underscores")
     return True
+
 
 def nonempty_string(text):
     if not isinstance(text, basestring):

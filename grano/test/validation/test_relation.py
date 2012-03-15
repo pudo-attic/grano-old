@@ -57,24 +57,6 @@ class TestRelationValidation(unittest.TestCase):
         in_['type'] = 'ownedBy'
         validate_relation(in_, self.schema, self.context)
 
-    #@h.raises(Invalid)
-    #def test_no_schema_attribute(self):
-    #    in_ = deepcopy(TEST_RELATION)
-    #    del in_['link_type']
-    #    validate_relation(in_, self.schema, self.context)
-
-    @h.raises(Invalid)
-    def test_no_network(self):
-        in_ = deepcopy(TEST_RELATION)
-        del in_['network']
-        validate_relation(in_, self.schema, self.context)
-
-    @h.raises(Invalid)
-    def test_invalid_network(self):
-        in_ = deepcopy(TEST_RELATION)
-        in_['network'] = 'not there'
-        validate_relation(in_, self.schema, self.context)
-
     @h.raises(Invalid)
     def test_no_source(self):
         in_ = deepcopy(TEST_RELATION)

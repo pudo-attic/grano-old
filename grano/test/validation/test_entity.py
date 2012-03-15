@@ -53,16 +53,3 @@ class TestEntityValidation(unittest.TestCase):
         in_ = deepcopy(TEST_ENTITY)
         in_['type'] = 'animal'
         validate_entity(in_, self.schema, self.context)
-
-    @h.raises(Invalid)
-    def test_no_network(self):
-        in_ = deepcopy(TEST_ENTITY)
-        del in_['network']
-        validate_entity(in_, self.schema, self.context)
-
-    @h.raises(Invalid)
-    def test_invalid_network(self):
-        in_ = deepcopy(TEST_ENTITY)
-        in_['network'] = 'foo bar'
-        validate_entity(in_, self.schema, self.context)
-

@@ -39,8 +39,7 @@ def make_types(network):
 
         __tablename__ = entity_table_name
         id = db.Column(db.String(36), primary_key=True, default=util.make_id)
-        serial = db.Column(db.Integer, primary_key=True,
-            default=util.make_serial)
+        serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
         type = db.Column(db.Unicode)
 
         __mapper_args__ = {'polymorphic_on': type}
@@ -54,15 +53,11 @@ def make_types(network):
         summary = db.Column(db.Unicode)
         description = db.Column(db.Unicode)
 
-        network_id = db.Column(db.Integer, db.ForeignKey('network.id'))
-        network = db.relationship('Network')
-
         def update_values(self, schema, data):
             self.title = data.get('title')
             self.slug = util.slugify(self.title)
             self.summary = data.get('summary')
             self.description = data.get('description')
-            self.network = data.get('network')
 
         def delete(self, schema):
             super(Entity, self).delete(schema)
@@ -80,8 +75,7 @@ def make_types(network):
                 'title': self.title,
                 'created_at': self.created_at,
                 'summary': self.summary,
-                'description': self.description,
-                'network': self.network.slug if self.network else None
+                'description': self.description
                 }
 
         def __repr__(self):
@@ -103,18 +97,12 @@ def make_types(network):
         current = db.Column(db.Boolean)
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-        network_id = db.Column(db.Integer, db.ForeignKey('network.id'))
-        source_id = db.Column(db.String(36),
-                db.ForeignKey(entity_table_name + '.id'))
-        target_id = db.Column(db.String(36),
-                db.ForeignKey(entity_table_name + '.id'))
-
-        network = db.relationship('Network')
+        source_id = db.Column(db.String(36))
+        target_id = db.Column(db.String(36))
 
         def update_values(self, schema, data):
             self.source_id = data.get('source').id
             self.target_id = data.get('target').id
-            self.network = data.get('network')
 
         def as_dict(self):
             return {
@@ -123,7 +111,6 @@ def make_types(network):
                 'type': self.type,
                 'current': self.current,
                 'created_at': self.created_at,
-                'network': self.network.slug,
                 'source': self.source_id,
                 'target': self.target_id
                 }
@@ -143,13 +130,9 @@ def make_types(network):
                 backref=db.backref('source', uselist=False,
                     primaryjoin=db.and_(Relation.source_id==Entity.id, Entity.current==True)))
 
-#    if entity_table:
-#        Entity.__table__ = entity_table
-    #import ipdb; ipdb.set_trace()
-#    if Entity.__tablename__ in db.metadata.tables:
-#        Entity.__table__ = db.metadata.tables[Entity.__tablename__]
-#    
-#    if Relation.__tablename__ in db.metadata.tables:
-#        Relation.__table__ = db.metadata.tables[Relation.__tablename__]
+    Entity.metadata = network.meta
+    Entity.__table__.metadata = network.meta
+    Relation.metadata = network.meta
+    Relation.__table__.metadata = network.meta
 
     return Entity, Relation

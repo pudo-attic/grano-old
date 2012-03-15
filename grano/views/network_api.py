@@ -40,6 +40,7 @@ def create():
 
 
 @api.route('/<slug>', methods=['GET'])
+@api.route('/networks/<slug>', methods=['GET'])
 def get(slug):
     """ Get a JSON representation of the network. """
     network = _get_network(slug)
@@ -47,6 +48,7 @@ def get(slug):
 
 
 @api.route('/<slug>', methods=['PUT'])
+@api.route('/networks/<slug>', methods=['PUT'])
 def update(slug):
     """ Update the data of the network. """
     network = _get_network(slug)
@@ -61,6 +63,7 @@ def update(slug):
 
 
 @api.route('/<slug>', methods=['DELETE'])
+@api.route('/networks/<slug>', methods=['DELETE'])
 def delete(slug):
     """ Delete the resource. """
     network = _get_network(slug)

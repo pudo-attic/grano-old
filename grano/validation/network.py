@@ -6,6 +6,7 @@ from grano.model.util import slugify
 from grano.validation.util import mapping, key, chained
 from grano.validation.util import nonempty_string, slug_name
 
+
 def available_slug(context):
     """ Check that the slug is either unused or used by the network
     we're currently editing. """
@@ -16,6 +17,7 @@ def available_slug(context):
             return "This network name is already in use, please choose another."
         return True
     return _check
+
 
 def validate_network(data, context):
     network = mapping('network')
@@ -29,6 +31,3 @@ def validate_network(data, context):
     if not 'slug' in data:
         data['slug'] = slugify(data.get('title', ''))
     return network.deserialize(data)
-
-
-

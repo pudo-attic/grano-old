@@ -1,6 +1,6 @@
 from grano.validation.util import mapping, key, chained, _node
 from grano.validation.util import nonempty_string, in_
-from grano.validation.types import NetworkSchemaType, EntitySchemaType
+from grano.validation.types import EntitySchemaType
 from grano.validation.schema import apply_schema
 
 def source_not_target(data):
@@ -16,9 +16,7 @@ def validate_relation(data, schema, context):
             nonempty_string,
             in_([schema.name])
         )))
-    relation.add(_node(NetworkSchemaType(context), 'network'))
     relation.add(_node(EntitySchemaType(context), 'source'))
     relation.add(_node(EntitySchemaType(context), 'target'))
     entity = apply_schema(relation, schema)
     return entity.deserialize(data)
-

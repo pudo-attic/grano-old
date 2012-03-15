@@ -2,6 +2,7 @@ from grano.model import Account
 from grano.validation.util import mapping, key, chained
 from grano.validation.util import nonempty_string, slug_name
 
+
 def available_name(context):
     """ Check that the name is either unused or the account
     we're currently editing. """
@@ -13,10 +14,12 @@ def available_name(context):
         return True
     return _check
 
+
 def confirmed_password(mapping):
     if mapping.get('password') != mapping.get('password_repeat'):
         return "The entered passwords do not match!"
     return True
+
 
 def validate_account(data, context):
     schema = mapping('account', validator=chained(
