@@ -73,6 +73,13 @@ def get(slug, id):
     return jsonify(entity)
 
 
+@api.route('/<slug>/entities/<id>/deep', methods=['GET'])
+def deep(slug, id):
+    """ Get a recursive JSON representation of the entity. """
+    network, entity = _get_entity(slug, id)
+    return jsonify(entity.as_deep_dict())
+
+
 @api.route('/<slug>/entities/<id>/history', methods=['GET'])
 def history(slug, id):
     """ Get a JSON representation of the entity's revision history. """

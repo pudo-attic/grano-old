@@ -57,6 +57,13 @@ def get(slug, id):
     return jsonify(relation)
 
 
+@api.route('/<slug>/relations/<id>/deep', methods=['GET'])
+def deep(slug, id):
+    """ Get a recursive JSON representation of the relation. """
+    network, relation = _get_relation(slug, id)
+    return jsonify(relation.as_deep_dict())
+
+
 @api.route('/<slug>/relations/<id>/history', methods=['GET'])
 def history(slug, id):
     """ Get a JSON representation of the relation. """

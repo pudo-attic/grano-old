@@ -71,6 +71,19 @@ def make_types(network):
                 'created_at': self.created_at
                 }
 
+        def as_deep_dict(self):
+            data = self.as_dict()
+            data['incoming'], data['outgoing'] = [], []
+            for rel in self.incoming:
+                reldata = rel.as_dict()
+                reldata['source'] = rel.source.as_dict()
+                data['incoming'].append(reldata)
+            for rel in self.outgoing:
+                reldata = rel.as_dict()
+                reldata['target'] = rel.source.as_dict()
+                data['outgoing'].append(reldata)
+            return data
+
         def __repr__(self):
             return "<Entity:%s(%s,%s)>" % (self.type, self.id, self.slug)
 
@@ -107,6 +120,12 @@ def make_types(network):
                 'source': self.source_id,
                 'target': self.target_id
                 }
+
+        def as_deep_dict(self):
+            data = self.as_dict()
+            data['source'] = self.source.as_dict()
+            data['target'] = self.target.as_dict()
+            return data
 
         def __repr__(self):
             return "<Relation:%s(%s,%s,%s)>" % (self.type, self.id,
