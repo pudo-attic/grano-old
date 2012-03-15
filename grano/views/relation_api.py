@@ -31,8 +31,7 @@ def index(slug):
     network = _get_network(slug)
     require.relation.list(network)
     """ List all available relations. """
-    ids = [e.id for e in network.Relation.all()]
-    return jsonify(ids)
+    return jsonify(network.Relation.all())
 
 
 @api.route('/<slug>/relations', methods=['POST'])
