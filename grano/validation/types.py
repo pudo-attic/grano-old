@@ -1,7 +1,5 @@
 from colander import SchemaType, Invalid, null
 
-from grano.model import Network
-
 
 class ValidationContext(object):
 
