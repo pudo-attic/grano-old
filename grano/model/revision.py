@@ -21,10 +21,9 @@ class RevisionedMixIn(object):
         versioned object while changing the serial number to
         differentiate the child. """
         obj = schema.cls()
-        obj.id = self.id
-        data_ = self.as_dict()
-        data_.update(data)
-        obj._update(schema, data_)
+        if self.id:
+            obj.id = self.id
+        obj._update(schema, data)
         return obj
 
     def _update(self, schema, data, current=True):
@@ -34,7 +33,8 @@ class RevisionedMixIn(object):
         self.update_values(schema, data)
         self.serial = make_serial()
         self.type = schema.name
-        if current:
+        self.current = current
+        if current and self.id:
             # this is slightly hacky but it cannot
             # be assumed that the `current` version
             # is the parent object to the new obj.
@@ -42,7 +42,6 @@ class RevisionedMixIn(object):
             q = table.update().where(table.c.id == self.id)
             q = q.values({'current': False})
             db.session.execute(q)
-            self.current = True
         db.session.add(self)
         db.session.flush()
 
