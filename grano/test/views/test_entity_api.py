@@ -11,8 +11,7 @@ ENTITY_FIXTURE = {'title': 'Winnie Pooh',
                   'network': 'net',
                   'birth_day': '2011-01-01',
                   'birth_place': 'The Tree',
-                  'death_day': '2012-01-01',
-                  'description': 'Entity of the year'}
+                  'death_day': '2012-01-01'}
 
 from grano.core import db
 from grano.model import Network, Schema

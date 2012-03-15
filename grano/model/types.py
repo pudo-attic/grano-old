@@ -39,7 +39,7 @@ def make_types(network):
 
         __tablename__ = entity_table_name
         id = db.Column(db.String(36), primary_key=True, default=util.make_id)
-        serial = db.Column(db.Integer, primary_key=True, default=util.make_serial)
+        serial = db.Column(db.BigInteger, primary_key=True, default=util.make_serial)
         type = db.Column(db.Unicode)
 
         __mapper_args__ = {'polymorphic_on': type}
@@ -50,14 +50,9 @@ def make_types(network):
         slug = db.Column(db.Unicode)
         title = db.Column(db.Unicode)
 
-        summary = db.Column(db.Unicode)
-        description = db.Column(db.Unicode)
-
         def update_values(self, schema, data):
             self.title = data.get('title')
             self.slug = util.slugify(self.title)
-            self.summary = data.get('summary')
-            self.description = data.get('description')
 
         def delete(self, schema):
             super(Entity, self).delete(schema)
@@ -73,9 +68,7 @@ def make_types(network):
                 'current': self.current,
                 'slug': self.slug,
                 'title': self.title,
-                'created_at': self.created_at,
-                'summary': self.summary,
-                'description': self.description
+                'created_at': self.created_at
                 }
 
         def __repr__(self):
@@ -87,7 +80,7 @@ def make_types(network):
 
         __tablename__ = relation_table_name
         id = db.Column(db.String(36), primary_key=True, default=util.make_id)
-        serial = db.Column(db.Integer, primary_key=True,
+        serial = db.Column(db.BigInteger, primary_key=True,
             default=util.make_serial)
         type = db.Column(db.Unicode)
 

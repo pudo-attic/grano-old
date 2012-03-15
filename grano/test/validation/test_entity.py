@@ -14,7 +14,6 @@ from grano.validation.types import ValidationContext
 
 TEST_ENTITY = {
     'title': 'Test Person',
-    'summary': 'This is a test',
     'type': 'person',
     'network': 'net',
     'birth_day': '2011-01-01',

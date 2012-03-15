@@ -12,7 +12,5 @@ def validate_entity(data, schema, context):
             nonempty_string,
             in_([schema.name])
         )))
-    entity.add(key('summary', missing=None))
-    entity.add(key('description', missing=None))
     entity = apply_schema(entity, schema)
     return entity.deserialize(data)

@@ -111,7 +111,7 @@ class Schema(db.Model):
         cls = {
             '__tablename__': prefix + '__' + self.name,
             'id': db.Column(db.String(36), primary_key=True),
-            'serial': db.Column(db.Integer, primary_key=True)
+            'serial': db.Column(db.BigInteger, primary_key=True)
             }
 
         # set up inheritance:
