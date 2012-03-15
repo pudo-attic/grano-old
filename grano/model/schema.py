@@ -55,16 +55,16 @@ class Schema(db.Model):
         self.entity = entity
         db.session.add(self)
         db.session.flush()
-        remaining = []
-        for name, data in data.get('attributes', {}).items():
-            remaining.append(name)
+        attributes = data.get('attributes', {})
+        for attribute in self.attributes:
+            if attribute.name in attributes:
+                del attributes[attribute.name]
+            else:
+                attribute.delete()
+        for name, data in attributes.items():
             attr = Attribute.create(name, data)
             self.attributes.append(attr)
-        for attribute in self.attributes:
-            if not attribute.name in remaining:
-                attribute.delete()
         db.session.flush()
-        #db.session.commit()
         self.migrate()
 
     def migrate(self):
