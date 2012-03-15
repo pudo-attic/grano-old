@@ -7,7 +7,7 @@ def available_name(context):
     """ Check that the name is either unused or the account
     we're currently editing. """
     def _check(value):
-        if context.account and context.account.name == name:
+        if context.account and context.account.name == value:
             return True
         if Account.by_name(value) is not None:
             return "This account name is already in use, please choose another."
