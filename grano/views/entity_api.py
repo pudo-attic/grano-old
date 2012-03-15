@@ -1,11 +1,9 @@
-from itertools import groupby
-
 from flask import Blueprint, request, redirect, url_for
-from werkzeug.datastructures import MultiDict
 
 from grano.core import db
 from grano.validation import validate_entity, ValidationContext
 from grano.views.network_api import _get_network
+from grano.views.common import filtered_query
 from grano.util import request_content, jsonify
 from grano.exc import Gone, NotFound, BadRequest
 from grano.auth import require
@@ -36,17 +34,7 @@ def index(slug):
     require.entity.list(network)
     type_name = request.args.get('type', None)
     type_ = _get_schema(network, type_name).cls if type_name else network.Entity
-    query = type_.all()
-    try:
-        filter_ = [f.split(':', 1) for f in request.args.getlist('filter')]
-        for key, values in groupby(filter_, lambda a: a[0]):
-            attr = getattr(type_, key)
-            clause = db.or_(*[attr == v[1] for v in values])
-            query = query.filter(clause)
-        query = query.limit(min(10000, int(request.args.get('limit', 100))))
-        query = query.offset(int(request.args.get('offset', 0)))
-    except (ValueError, AttributeError, IndexError) as e:
-        raise BadRequest(e)
+    query = filtered_query(type_, request)
     return jsonify(query)
 
 

@@ -3,6 +3,7 @@ from flask import Blueprint, request, redirect, url_for
 from grano.core import db
 from grano.validation import validate_relation, ValidationContext
 from grano.views.network_api import _get_network
+from grano.views.common import filtered_query
 from grano.util import request_content, jsonify
 from grano.exc import Gone, NotFound, BadRequest
 from grano.auth import require
@@ -28,10 +29,13 @@ def _get_relation(slug, id):
 
 @api.route('/<slug>/relations', methods=['GET'])
 def index(slug):
+    """ List all available relations. """
     network = _get_network(slug)
     require.relation.list(network)
-    """ List all available relations. """
-    return jsonify(network.Relation.all())
+    type_name = request.args.get('type', None)
+    type_ = _get_schema(network, type_name).cls if type_name else network.Relation
+    query = filtered_query(type_, request)
+    return jsonify(query)
 
 
 @api.route('/<slug>/relations', methods=['POST'])
