@@ -63,6 +63,9 @@ def apply_schema(base, schema):
     schema. """
     for attribute in schema.attributes:
         validator = ATTRIBUTE_VALIDATORS[attribute.type]
+        missing = attribute.missing
+        if validator == colander.Boolean:
+            missing = missing or "0"
         base.add(_node(validator(), attribute.name,
                  missing=attribute.missing, empty=attribute.missing))
     return base
