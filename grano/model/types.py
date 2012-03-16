@@ -134,12 +134,12 @@ def make_types(network):
     Entity.incoming = db.relationship(Relation, lazy='dynamic',
                 primaryjoin=db.and_(Relation.target_id==Entity.id, Relation.current==True),
                 foreign_keys=[Entity.id],
-                backref=db.backref('target', uselist=False,
+                backref=db.backref('source', uselist=False,
                     primaryjoin=db.and_(Relation.target_id==Entity.id, Entity.current==True)))
     Entity.outgoing = db.relationship(Relation, lazy='dynamic',
                 primaryjoin=db.and_(Relation.source_id==Entity.id, Relation.current==True),
                 foreign_keys=[Entity.id],
-                backref=db.backref('source', uselist=False,
+                backref=db.backref('target', uselist=False,
                     primaryjoin=db.and_(Relation.source_id==Entity.id, Entity.current==True)))
 
     Entity.metadata = network.meta
