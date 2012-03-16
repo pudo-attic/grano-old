@@ -1,5 +1,5 @@
 from grano.core import db
-from grano.model.util import make_serial
+from grano.model.util import make_serial, make_id
 
 
 class RevisionedMixIn(object):
@@ -13,6 +13,7 @@ class RevisionedMixIn(object):
     def create(cls, schema, data):
         """ Create a new, versioned object. """
         obj = schema.cls()
+        obj.id = make_id()
         obj._update(schema, data)
         return obj
 
