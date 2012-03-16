@@ -104,9 +104,11 @@ class Network(db.Model):
 
     def raw_query(self, query, *a, **kw):
         conn = db.engine.connect()
-        true = db.Boolean().bind_processor(db.engine.dialect)(True)
         for rs in chain(self.relation_schemata, self.entity_schemata):
-            q = rs.cls.view().replace("?", str(true))
+            if conn.dialect.name == 'postgresql':
+                q = rs.cls.view().replace(":current_1", 'true')
+            else:
+                q = rs.cls.view().replace("?", '1')
             conn.execute(q)
         return conn.execute(query, *a, **kw)
 
