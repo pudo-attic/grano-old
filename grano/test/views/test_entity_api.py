@@ -87,7 +87,7 @@ class EntityAPITestCase(unittest.TestCase):
         res = self.app.put('/api/1/net/entities/%s' % self.id, 
                     headers=AUTHZ_HEADER,
                     data=body)
-        assert res.status_code==200,res.status_code
+        assert res.status_code==202,res.status_code
         body = json.loads(res.data)
         assert body['title']==t, body
         

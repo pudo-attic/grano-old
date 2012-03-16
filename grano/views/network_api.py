@@ -36,7 +36,8 @@ def create():
             context)
     network = Network.create(data)
     db.session.commit()
-    return redirect(url_for('.get', slug=network.slug))
+    url = url_for('.get', slug=network.slug)
+    return jsonify(network, status=201, headers={'location': url})
 
 
 @api.route('/<slug>', methods=['GET'])

@@ -64,5 +64,5 @@ def apply_schema(base, schema):
     for attribute in schema.attributes:
         validator = ATTRIBUTE_VALIDATORS[attribute.type]
         base.add(_node(validator(), attribute.name,
-                 missing=attribute.missing))
+                 missing=attribute.missing, empty=attribute.missing))
     return base

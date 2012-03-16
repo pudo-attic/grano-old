@@ -50,8 +50,8 @@ def create(slug):
             schema, context)
     relation = network.Relation.create(schema, data)
     db.session.commit()
-    return redirect(url_for('.get', slug=network.slug, \
-                            id=relation.id))
+    url = url_for('.get', slug=network.slug, id=relation.id)
+    return jsonify(relation, status=201, headers={'location': url})
 
 
 @api.route('/<slug>/relations/<id>', methods=['GET'])

@@ -51,8 +51,9 @@ def create(slug, type):
     data = validate_schema(dict(data.items()))
     schema = Schema.create(network, type, data)
     db.session.commit()
-    return redirect(url_for('.get', slug=network.slug,
-                    type=schema.entity, name=schema.name))
+    url = url_for('.get', slug=network.slug,
+            type=schema.entity, name=schema.name)
+    return jsonify(schema, status=201, headers={'location': url})
 
 
 @api.route('/<slug>/schemata/<type>/<name>', methods=['GET'])
@@ -71,7 +72,7 @@ def update(slug, type, name):
     data = validate_schema(dict(data.items()))
     schema.update(network, type, data)
     db.session.commit()
-    return jsonify(schema)
+    return jsonify(schema, status=202)
 
 
 @api.route('/<slug>/schemata/<type>/<name>', methods=['DELETE'])

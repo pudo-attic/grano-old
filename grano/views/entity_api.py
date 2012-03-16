@@ -50,8 +50,8 @@ def create(slug):
             schema, context)
     entity = network.Entity.create(schema, data)
     db.session.commit()
-    return redirect(url_for('.get', slug=network.slug, \
-                            id=entity.id))
+    url = url_for('.get', slug=network.slug, id=entity.id)
+    return jsonify(entity, status=201, headers={'location': url})
 
 
 @api.route('/<slug>/entities/<id>', methods=['GET'])
@@ -87,7 +87,7 @@ def update(slug, id):
     data = validate_entity(data, schema, context)
     updated_entity = entity.update(schema, data)
     db.session.commit()
-    return jsonify(updated_entity)
+    return jsonify(updated_entity, status=202)
 
 
 @api.route('/<slug>/entities/<id>', methods=['DELETE'])
