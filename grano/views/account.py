@@ -7,6 +7,7 @@ from grano.validation import ValidationContext
 from grano.validation import validate_account, Invalid
 from grano.util import request_content, error_fill
 from grano.util import invalid_dict, login_user, logout_user
+from grano.auth import require
 
 section = Blueprint('account', __name__)
 
@@ -14,12 +15,14 @@ section = Blueprint('account', __name__)
 @section.route('/register', methods=['GET'])
 def register_form():
     """ Show the sign-up form. """
+    require.account.create()
     return render_template('account/register.tmpl')
 
 
 @section.route('/register', methods=['POST'])
 def register_save():
     """ Create an account based on the sign-up form. """
+    require.account.create()
     data = request_content(request)
     context = ValidationContext()
     try:

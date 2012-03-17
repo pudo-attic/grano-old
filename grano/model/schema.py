@@ -10,7 +10,7 @@ log = logging.getLogger(__name__)
 ATTRIBUTE_TYPES_DB = {
     'string': db.Unicode,
     'float': db.Float,
-    'integer': db.Integer,
+    'integer': db.BigInteger,
     'date': db.DateTime,
     'boolean': db.Boolean
     }

@@ -4,13 +4,15 @@ from colander import Invalid
 from grano.model import Account
 from grano.core import app, current_user, login_manager
 from grano.util import response_format, jsonify, login_user
+from grano import auth
 from grano.views import *
 
 
 @app.context_processor
 def set_template_context():
     """ Set some template context globals. """
-    return dict(current_user=current_user)
+    return dict(current_user=current_user,
+                can=auth)
 
 
 @login_manager.user_loader
