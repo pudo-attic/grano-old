@@ -1,6 +1,9 @@
 from datetime import datetime
 from itertools import chain
 
+from sqlalchemy.sql.expression import text
+from sqlalchemy.exc import ProgrammingError
+
 from grano.core import db
 from grano.model.types import make_types
 from grano.model.schema import Schema
@@ -102,7 +105,8 @@ class Network(db.Model):
             #'num_relations': self.relations.count(),
             }
 
-    def raw_query(self, query, *a, **kw):
+    def raw_query(self, query, **kw):
+        db.engine.dispose()
         conn = db.engine.connect()
         for rs in chain(self.relation_schemata, self.entity_schemata):
             if conn.dialect.name == 'postgresql':
@@ -110,7 +114,7 @@ class Network(db.Model):
             else:
                 q = rs.cls.view().replace("?", '1')
             conn.execute(q)
-        return conn.execute(query, *a, **kw)
+        return conn.execute(text(query), **kw)
 
     @classmethod
     def by_id(self, id):

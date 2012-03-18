@@ -1,6 +1,6 @@
 from flask import Blueprint, request, redirect, url_for
 
-from grano.core import db
+from grano.core import db, app
 from grano.model import Network
 from grano.validation import validate_network, ValidationContext
 from grano.util import request_content, jsonify
@@ -72,3 +72,37 @@ def delete(slug):
     network.delete()
     db.session.commit()
     raise Gone('Successfully deleted: %s' % slug)
+
+
+@api.route('/<slug>/queries', methods=['GET'])
+@api.route('/networks/<slug>/queries', methods=['GET'])
+def queries(slug):
+    """ Get a JSON representation of stored queries. """
+    #network = _get_network(slug)
+    # TODO: Keep queries in DB
+    return jsonify(app.config.get('STORED_QUERIES', {}))
+
+
+@api.route('/<slug>/queries/<name>', methods=['GET'])
+@api.route('/networks/<slug>/queries/<name>', methods=['GET'])
+def query(slug, name):
+    """ Get a JSON representation of stored queries. """
+    # TODO: Keep queries in DB
+    # TODO: Use read-only DB connection
+    network = _get_network(slug)
+    query = app.config.get('STORED_QUERIES', {}).get(name)
+    if query is None:
+        raise NotFound("No such query!")
+    try:
+        rp = network.raw_query(query['query'], **dict(request.args.items()))
+    except Exception as exc:
+        raise
+        #return jsonify({'error': unicode(exc), 'query': query}, status=400)
+    result = []
+    while True:
+        row = rp.fetchone()
+        if row is None:
+            break
+        row = dict(zip(rp.keys(), row))
+        result.append(row)
+    return jsonify({'result': result, 'query': query})
