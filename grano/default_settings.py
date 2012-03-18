@@ -10,6 +10,6 @@ SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/grano_lobby'
 STORED_QUERIES = {
     'test': {
         'label': 'Test Query',
-        'query': 'SELECT * FROM entity_actor LIMIT :limit'
+        'query': 'SELECT * FROM entity_actor'
         }
     }

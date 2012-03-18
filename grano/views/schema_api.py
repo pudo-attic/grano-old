@@ -1,7 +1,7 @@
-from flask import Blueprint, request, redirect, url_for
+from flask import Blueprint, request, url_for
 
 from grano.core import db
-from grano.util import request_content, jsonify
+from grano.util import request_content, jsonify, crossdomain
 from grano.model import Schema
 from grano.views.network_api import _get_network
 from grano.validation.schema import validate_schema
@@ -28,7 +28,8 @@ def _get_schema(network, type, name):
     return schema
 
 
-@api.route('/<slug>/schemata/<type>', methods=['GET'])
+@api.route('/<slug>/schemata/<type>', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def index(slug, type):
     """ List all available schemata for a type. """
     network = _get_network(slug)
@@ -56,7 +57,8 @@ def create(slug, type):
     return jsonify(schema, status=201, headers={'location': url})
 
 
-@api.route('/<slug>/schemata/<type>/<name>', methods=['GET'])
+@api.route('/<slug>/schemata/<type>/<name>', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def get(slug, type, name):
     network = _get_network(slug)
     schema = _get_schema(network, type, name)

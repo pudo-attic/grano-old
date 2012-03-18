@@ -1,10 +1,10 @@
-from flask import Blueprint, request, redirect, url_for
+from flask import Blueprint, request, url_for
 
 from grano.core import db
 from grano.validation import validate_entity, ValidationContext
 from grano.views.network_api import _get_network
 from grano.views.common import filtered_query
-from grano.util import request_content, jsonify
+from grano.util import request_content, jsonify, crossdomain
 from grano.exc import Gone, NotFound, BadRequest
 from grano.auth import require
 
@@ -27,7 +27,8 @@ def _get_entity(slug, id):
     return network, entity
 
 
-@api.route('/<slug>/entities', methods=['GET'])
+@api.route('/<slug>/entities', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def index(slug):
     """ List all available entities. """
     network = _get_network(slug)
@@ -54,21 +55,24 @@ def create(slug):
     return jsonify(entity, status=201, headers={'location': url})
 
 
-@api.route('/<slug>/entities/<id>', methods=['GET'])
+@api.route('/<slug>/entities/<id>', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def get(slug, id):
     """ Get a JSON representation of the entity. """
     network, entity = _get_entity(slug, id)
     return jsonify(entity)
 
 
-@api.route('/<slug>/entities/<id>/deep', methods=['GET'])
+@api.route('/<slug>/entities/<id>/deep', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def deep(slug, id):
     """ Get a recursive JSON representation of the entity. """
     network, entity = _get_entity(slug, id)
     return jsonify(entity.as_deep_dict())
 
 
-@api.route('/<slug>/entities/<id>/history', methods=['GET'])
+@api.route('/<slug>/entities/<id>/history', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def history(slug, id):
     """ Get a JSON representation of the entity's revision history. """
     network, entity = _get_entity(slug, id)

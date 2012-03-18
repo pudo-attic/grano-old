@@ -134,12 +134,7 @@
 
     <script src="/static/js/app.js"></script>
 
-    <script>
-      $(function() {
-        window.app = new Grano.App();
-        Backbone.history.start();
-      });
-    </script>
+    {% block script %}{% endblock %}
   </body>
 </html>
 

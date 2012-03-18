@@ -1,10 +1,10 @@
-from flask import Blueprint, request, redirect, url_for
+from flask import Blueprint, request, url_for
 
 from grano.core import db
 from grano.validation import validate_relation, ValidationContext
 from grano.views.network_api import _get_network
 from grano.views.common import filtered_query
-from grano.util import request_content, jsonify
+from grano.util import request_content, jsonify, crossdomain
 from grano.exc import Gone, NotFound, BadRequest
 from grano.auth import require
 
@@ -27,7 +27,8 @@ def _get_relation(slug, id):
     return network, relation
 
 
-@api.route('/<slug>/relations', methods=['GET'])
+@api.route('/<slug>/relations', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def index(slug):
     """ List all available relations. """
     network = _get_network(slug)
@@ -55,20 +56,23 @@ def create(slug):
 
 
 @api.route('/<slug>/relations/<id>', methods=['GET'])
+@crossdomain(origin='*')
 def get(slug, id):
     """ Get a JSON representation of the relation. """
     network, relation = _get_relation(slug, id)
     return jsonify(relation)
 
 
-@api.route('/<slug>/relations/<id>/deep', methods=['GET'])
+@api.route('/<slug>/relations/<id>/deep', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def deep(slug, id):
     """ Get a recursive JSON representation of the relation. """
     network, relation = _get_relation(slug, id)
     return jsonify(relation.as_deep_dict())
 
 
-@api.route('/<slug>/relations/<id>/history', methods=['GET'])
+@api.route('/<slug>/relations/<id>/history', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def history(slug, id):
     """ Get a JSON representation of the relation. """
     network, relation = _get_relation(slug, id)

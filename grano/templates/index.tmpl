@@ -9,3 +9,13 @@
 {% endblock %}
 
 
+{% block script %}
+    <script>
+      $(function() {
+        window.app = new Grano.App();
+        Backbone.history.start();
+      });
+    </script>
+{% endblock %}
+
+

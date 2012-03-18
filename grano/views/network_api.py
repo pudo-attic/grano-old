@@ -1,9 +1,11 @@
-from flask import Blueprint, request, redirect, url_for
+from itertools import count
+
+from flask import Blueprint, request, url_for
 
 from grano.core import db, app
 from grano.model import Network
 from grano.validation import validate_network, ValidationContext
-from grano.util import request_content, jsonify
+from grano.util import request_content, jsonify, crossdomain
 from grano.exc import Gone, NotFound
 from grano.auth import require
 
@@ -19,6 +21,7 @@ def _get_network(slug):
 
 
 @api.route('/networks', methods=['GET'])
+@crossdomain(origin='*')
 def index():
     """ List all available networks. """
     require.network.list()
@@ -40,8 +43,9 @@ def create():
     return jsonify(network, status=201, headers={'location': url})
 
 
-@api.route('/<slug>', methods=['GET'])
-@api.route('/networks/<slug>', methods=['GET'])
+@api.route('/<slug>', methods=['GET', 'OPTIONS'])
+@api.route('/networks/<slug>', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def get(slug):
     """ Get a JSON representation of the network. """
     network = _get_network(slug)
@@ -74,8 +78,9 @@ def delete(slug):
     raise Gone('Successfully deleted: %s' % slug)
 
 
-@api.route('/<slug>/queries', methods=['GET'])
-@api.route('/networks/<slug>/queries', methods=['GET'])
+@api.route('/<slug>/queries', methods=['GET', 'OPTIONS'])
+@api.route('/networks/<slug>/queries', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def queries(slug):
     """ Get a JSON representation of stored queries. """
     #network = _get_network(slug)
@@ -83,8 +88,9 @@ def queries(slug):
     return jsonify(app.config.get('STORED_QUERIES', {}))
 
 
-@api.route('/<slug>/queries/<name>', methods=['GET'])
-@api.route('/networks/<slug>/queries/<name>', methods=['GET'])
+@api.route('/<slug>/queries/<name>', methods=['GET', 'OPTIONS'])
+@api.route('/networks/<slug>/queries/<name>', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
 def query(slug, name):
     """ Get a JSON representation of stored queries. """
     # TODO: Keep queries in DB
@@ -94,15 +100,21 @@ def query(slug, name):
     if query is None:
         raise NotFound("No such query!")
     try:
+        limit = int(request.args.get('limit', 100))
+        offset = int(request.args.get('offset', 0))
         rp = network.raw_query(query['query'], **dict(request.args.items()))
     except Exception as exc:
-        raise
-        #return jsonify({'error': unicode(exc), 'query': query}, status=400)
+        return jsonify({'error': unicode(exc), 'query': query}, status=400)
     result = []
-    while True:
+    for i in count():
         row = rp.fetchone()
-        if row is None:
+        if row is None or i >= limit + offset:
             break
+        if i < offset:
+            continue
         row = dict(zip(rp.keys(), row))
         result.append(row)
-    return jsonify({'result': result, 'query': query})
+    return jsonify({
+            'results': result,
+            'count': rp.rowcount,
+            'query': query})
