@@ -23,6 +23,7 @@ class TestEntity(unittest.TestCase):
 
     def test_entity_schema(self):
         obj = self.schema.cls()
+        obj.id = 'hello'
         obj.birth_place = 'Utopia'
         obj.title = 'The Man'
         obj.slug = 'the-man'

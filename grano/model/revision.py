@@ -76,5 +76,3 @@ class RevisionedMixIn(object):
         if network is not None:
             q = q.filter_by(network=network)
         return q
-
-
