@@ -27,6 +27,24 @@ def _get_entity(slug, id):
     return network, entity
 
 
+def _deep_create(data, entity, network):
+    for direction, attribute, local in (('incoming', 'source', 'target'),
+                                        ('outgoing', 'target', 'source')):
+        for rdata in data.get(direction, []):
+            rdata[local] = entity
+            odata = rdata.get(attribute)
+            if 'id' in odata:
+                rdata[attribute] = network.Entity.current_by_id(odata['id'])
+            else:
+                schema = network.get_entity_schema(odata['type'])
+                rdata[attribute] = network.Entity.create(schema, odata)
+            if 'id' in rdata:
+                network.Relation.current_by_id(rdata['id'])
+            else:
+                schema = network.get_relation_schema(rdata['type'])
+                network.Relation.create(schema, rdata)
+
+
 @api.route('/<slug>/entities', methods=['GET', 'OPTIONS'])
 @crossdomain(origin='*')
 def index(slug):
@@ -50,6 +68,7 @@ def create(slug):
     data = validate_entity(dict(data.items()),
             schema, context)
     entity = network.Entity.create(schema, data)
+    _deep_create(data, entity, network)
     db.session.commit()
     url = url_for('.get', slug=network.slug, id=entity.id)
     return jsonify(entity, status=201, headers={'location': url})
@@ -90,6 +109,7 @@ def update(slug, id):
     schema = _get_schema(network, data.get('type'))
     data = validate_entity(data, schema, context)
     updated_entity = entity.update(schema, data)
+    _deep_create(data, updated_entity, network)
     db.session.commit()
     return jsonify(updated_entity, status=202)
 

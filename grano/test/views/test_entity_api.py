@@ -1,6 +1,7 @@
 import unittest
 import json
 from copy import deepcopy
+from pprint import pprint 
 
 from grano.test.helpers import AUTHZ_HEADER
 
@@ -12,6 +13,16 @@ ENTITY_FIXTURE = {'title': 'Winnie Pooh',
                   'birth_day': '2011-01-01',
                   'birth_place': 'The Tree',
                   'death_day': '2012-01-01'}
+
+ENTITY1_FIXTURE = {'title': 'Hobbes', 
+                  'type': 'person',
+                  'network': 'net',
+                  'birth_day': '2011-01-01',
+                  'birth_place': 'The Tree',
+                  'death_day': '2012-01-01',
+                  'description': 'A teddy bear'}
+
+RELATION_FIXTURE = {'network': 'net', 'link_type': 'friendOf', 'type': 'social'}
 
 from grano.core import db
 from grano.model import Network, Schema
@@ -68,6 +79,19 @@ class EntityAPITestCase(unittest.TestCase):
         data['title'] = 'Tigger'
         res = self.app.post('/api/1/net/entities', data=data,
                     headers=AUTHZ_HEADER,
+                    follow_redirects=True)
+        body = json.loads(res.data)
+        assert body['title']==data['title'], body
+
+    def test_entity_create_deep(self):
+        data = deepcopy(ENTITY_FIXTURE)
+        other = deepcopy(ENTITY1_FIXTURE)
+        rel = deepcopy(RELATION_FIXTURE)
+        rel['target'] = other
+        data['outgoing'] = [rel]
+        res = self.app.post('/api/1/net/entities', data=json.dumps(data),
+                    headers=AUTHZ_HEADER,
+                    content_type='application/json',
                     follow_redirects=True)
         body = json.loads(res.data)
         assert body['title']==data['title'], body
