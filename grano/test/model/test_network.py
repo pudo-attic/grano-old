@@ -17,9 +17,8 @@ class TestNetwork(unittest.TestCase):
     def tearDown(self):
         h.tear_down_test_app()
 
-    def test_raw_query(self):
-        rp = self.network.raw_query("SELECT * FROM entity_person")
-        rows = rp.fetchall()
-        row = dict(zip(rp.keys(), rows[0]))
-        assert row['title'] == self.entity.title, row
-
+    #def test_raw_query(self):
+    #    rp = self.network.raw_query("SELECT * FROM entity_person")
+    #    rows = rp.fetchall()
+    #    row = dict(zip(rp.keys(), rows[0]))
+    #    assert row['title'] == self.entity.title, row
