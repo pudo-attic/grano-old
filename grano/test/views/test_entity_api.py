@@ -7,14 +7,14 @@ from grano.test.helpers import AUTHZ_HEADER
 
 NETWORK_FIXTURE = {'slug': 'net', 'title': 'Test Network'}
 
-ENTITY_FIXTURE = {'title': 'Winnie Pooh', 
+ENTITY_FIXTURE = {'title': 'Winnie Pooh',
                   'type': 'person',
                   'network': 'net',
                   'birth_day': '2011-01-01',
                   'birth_place': 'The Tree',
                   'death_day': '2012-01-01'}
 
-ENTITY1_FIXTURE = {'title': 'Hobbes', 
+ENTITY1_FIXTURE = {'title': 'Hobbes',
                   'type': 'person',
                   'network': 'net',
                   'birth_day': '2011-01-01',
@@ -65,7 +65,7 @@ class EntityAPITestCase(unittest.TestCase):
         body = json.loads(res.data)
         assert body['title']==ENTITY_FIXTURE['title'], body
     
-    def test_get(self):
+    def test_get_history(self):
         res = self.app.get('/api/1/net/entities/%s/history' % self.id)
         body = json.loads(res.data)
         assert len(body)==1,body
