@@ -33,16 +33,22 @@ def _deep_create(data, entity, network):
         for rdata in data.get(direction, []):
             rdata[local] = entity
             odata = rdata.get(attribute)
+
+            schema = network.get_entity_schema(odata['type'])
             if 'id' in odata:
-                rdata[attribute] = network.Entity.current_by_id(odata['id'])
+                entity_ = network.Entity.current_by_id(odata['id'])
+                entity_.update(schema, odata)
+                rdata[attribute] = entity_
             else:
-                schema = network.get_entity_schema(odata['type'])
                 rdata[attribute] = network.Entity.create(schema, odata)
+
+            schema = network.get_relation_schema(rdata['type'])
             if 'id' in rdata:
-                network.Relation.current_by_id(rdata['id'])
+                relation = network.Relation.current_by_id(rdata['id'])
+                relation.update(schema, rdata)
             else:
-                schema = network.get_relation_schema(rdata['type'])
-                network.Relation.create(schema, rdata)
+                relation = network.Relation.create(schema, rdata)
+
 
 
 @api.route('/<slug>/entities', methods=['GET', 'OPTIONS'])
