@@ -15,13 +15,12 @@ class EntitySchemaType(SchemaType):
 
     def serialize(self, node, appstruct):
         return {'id': appstruct.id,
-                'slug': appstruct.slug,
                 'type': appstruct.type}
 
     def deserialize(self, node, cstruct):
         id = cstruct.get('id') if isinstance(cstruct, dict) else cstruct
         if id is null or id is None:
-            raise Invalid(node, "No network specified")
+            raise Invalid(node, "No entity specified")
         obj = self.context.network.Entity.current_by_id(id)
         if obj is None:
             raise Invalid(node, "No such entity: %r")
