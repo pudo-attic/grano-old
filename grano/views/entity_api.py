@@ -36,7 +36,7 @@ def index(slug):
     type_name = request.args.get('type', None)
     type_ = _get_schema(network, type_name).cls if type_name else network.Entity
     query = filtered_query(type_, request)
-    return jsonify(query)
+    return jsonify({'results': query})
 
 
 @api.route('/<slug>/entities', methods=['POST'])
