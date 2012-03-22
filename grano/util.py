@@ -78,7 +78,10 @@ def invalid_dict(exc):
 
 def jsonify(obj, status=200, headers=None):
     """ Custom JSONificaton to support obj.to_dict protocol. """
-    return Response(json.dumps(obj, cls=JSONEncoder), headers=headers,
+    jsondata = json.dumps(obj, cls=JSONEncoder)
+    if 'callback' in request.args:
+        jsondata = '%s(%s)' % (request.args.get('callback'), jsondata)
+    return Response(jsondata, headers=headers,
                     status=status, mimetype='application/json')
 
 
