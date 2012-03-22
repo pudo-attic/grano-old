@@ -109,11 +109,8 @@ class Network(db.Model):
         db.engine.dispose()
         conn = db.engine.connect()
         for rs in chain(self.relation_schemata, self.entity_schemata):
-            if conn.dialect.name == 'postgresql':
-                q = rs.cls.view().replace(":current_1", 'true')
-            else:
-                q = rs.cls.view().replace("?", '1')
-            conn.execute(q)
+            q = rs.cls.view()
+            conn.execute(text(str(q)), current=True)
         return conn.execute(text(query), **kw)
 
     @classmethod

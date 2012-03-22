@@ -22,9 +22,9 @@ class ViewMixIn(object):
         columns = [c.label(c.name) for c in columns]
         q = select(columns,
             db.and_(parent_table.c.id == table.c.id,
-                    parent_table.c.serial == table.c.serial,
-                    parent_table.c.current == True))
-        return 'CREATE TEMP VIEW %s AS %s' % (view_name, q)
+                    parent_table.c.serial == table.c.serial))
+        return 'CREATE TEMP VIEW %s AS %s AND %s = :current' % (view_name, q,
+            parent_table.c.current)
 
 
 def make_types(network):
