@@ -3,9 +3,10 @@ from colander import SchemaType, Invalid, null
 
 class ValidationContext(object):
 
-    def __init__(self, network=None, account=None):
+    def __init__(self, network=None, account=None, query=None):
         self.network = network
         self.account = account
+        self.query = query
 
 
 class EntitySchemaType(SchemaType):

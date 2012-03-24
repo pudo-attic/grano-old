@@ -7,6 +7,7 @@ import entity
 import relation
 import schema
 import account
+import query
 
 from util import logged_in
 

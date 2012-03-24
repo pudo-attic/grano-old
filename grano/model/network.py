@@ -1,8 +1,4 @@
 from datetime import datetime
-from itertools import chain
-
-from sqlalchemy.sql.expression import text
-from sqlalchemy.exc import ProgrammingError
 
 from grano.core import db
 from grano.model.types import make_types
@@ -104,14 +100,6 @@ class Network(db.Model):
             #'num_entities': self.entities.count(),
             #'num_relations': self.relations.count(),
             }
-
-    def raw_query(self, query, **kw):
-        db.engine.dispose()
-        conn = db.engine.connect()
-        for rs in chain(self.relation_schemata, self.entity_schemata):
-            q = rs.cls.view()
-            conn.execute(text(str(q)), current=True)
-        return conn.execute(text(query), **kw)
 
     @classmethod
     def by_id(self, id):
