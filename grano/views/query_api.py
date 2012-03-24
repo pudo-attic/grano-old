@@ -55,7 +55,7 @@ def get(slug, name):
 
 @api.route('/<slug>/queries/<name>/run', methods=['GET', 'OPTIONS'])
 @crossdomain(origin='*')
-def query(slug, name):
+def run(slug, name):
     """ Get a JSON representation of stored queries. """
     # TODO: Use read-only DB connection
     network, query = _get_query(slug, name)
