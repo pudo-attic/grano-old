@@ -156,8 +156,8 @@ class Schema(db.Model):
 
 
 class Attribute(db.Model):
-    """ Attributes are specific properties of a schema for either an entity or 
-    a relation. They materialize as columns on the joined sub-table for the 
+    """ Attributes are specific properties of a schema for either an entity or
+    a relation. They materialize as columns on the joined sub-table for the
     schema. """
     __tablename__ = 'schema_attribute'
 

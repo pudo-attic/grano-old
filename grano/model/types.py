@@ -84,6 +84,10 @@ def make_types(network):
                 data['outgoing'].append(reldata)
             return data
 
+        def as_nx(self, graph):
+            return graph.add_node(self.id, type=self.type,
+                title=self.title)
+
         def __repr__(self):
             return "<Entity:%s(%s,%s)>" % (self.type, self.id, self.slug)
 
@@ -127,20 +131,24 @@ def make_types(network):
             data['target'] = self.target.as_dict()
             return data
 
+        def as_nx(self, graph):
+            return graph.add_edge(self.source_id, self.target_id,
+                id=self.id, type=self.type)
+
         def __repr__(self):
             return "<Relation:%s(%s,%s,%s)>" % (self.type, self.id,
                     self.source_id, self.target_id)
 
     Entity.incoming = db.relationship(Relation, lazy='dynamic',
-                primaryjoin=db.and_(Relation.target_id==Entity.id, Relation.current==True),
+                primaryjoin=db.and_(Relation.target_id == Entity.id, Relation.current == True),
                 foreign_keys=[Entity.id],
                 backref=db.backref('target', uselist=False,
-                    primaryjoin=db.and_(Relation.target_id==Entity.id, Entity.current==True)))
+                    primaryjoin=db.and_(Relation.target_id == Entity.id, Entity.current == True)))
     Entity.outgoing = db.relationship(Relation, lazy='dynamic',
-                primaryjoin=db.and_(Relation.source_id==Entity.id, Relation.current==True),
+                primaryjoin=db.and_(Relation.source_id == Entity.id, Relation.current == True),
                 foreign_keys=[Entity.id],
                 backref=db.backref('source', uselist=False,
-                    primaryjoin=db.and_(Relation.source_id==Entity.id, Entity.current==True)))
+                    primaryjoin=db.and_(Relation.source_id == Entity.id, Entity.current == True)))
 
     Entity.metadata = network.meta
     Entity.__table__.metadata = network.meta

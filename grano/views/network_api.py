@@ -1,4 +1,6 @@
-from flask import Blueprint, request, url_for
+from flask import Blueprint, request, url_for, Response
+
+import networkx as nx
 
 from grano.core import db
 from grano.model import Network
@@ -48,6 +50,28 @@ def get(slug):
     """ Get a JSON representation of the network. """
     network = _get_network(slug)
     return jsonify(network)
+
+
+@api.route('/<slug>/graph', methods=['GET', 'OPTIONS'])
+@api.route('/networks/<slug>/graph', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
+def graph(slug):
+    """ Get a JSON representation of the network. """
+    network = _get_network(slug)
+    graph = nx.DiGraph()
+
+    for entity in network.entities:
+        entity.as_nx(graph)
+    for relation in network.relations:
+        relation.as_nx(graph)
+
+    out = ''
+    for line in nx.generate_gexf(graph):
+        #print [line]
+        out += line
+
+    return Response(out, status=200,
+        content_type='text/xml')
 
 
 @api.route('/<slug>', methods=['PUT'])

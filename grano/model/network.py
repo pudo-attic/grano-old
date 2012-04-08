@@ -41,11 +41,11 @@ class Network(db.Model):
 
     @property
     def all_entities(self):
-        return db.query(self.Entity)
+        return db.session.query(self.Entity)
 
     @property
     def all_relations(self):
-        return db.query(self.Relation)
+        return db.session.query(self.Relation)
 
     @property
     def entities(self):
