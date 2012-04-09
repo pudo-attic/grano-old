@@ -58,8 +58,8 @@ def index(slug):
     require.entity.list(network)
     type_name = request.args.get('type', None)
     type_ = _get_schema(network, type_name).cls if type_name else network.Entity
-    query = filtered_query(type_, request, fts=True)
-    return jsonify({'results': query})
+    count, query = filtered_query(type_, request, fts=True)
+    return jsonify({'results': query, 'count': count})
 
 
 @api.route('/<slug>/entities', methods=['POST'])

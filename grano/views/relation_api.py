@@ -35,8 +35,8 @@ def index(slug):
     require.relation.list(network)
     type_name = request.args.get('type', None)
     type_ = _get_schema(network, type_name).cls if type_name else network.Relation
-    query = filtered_query(type_, request)
-    return jsonify({'results': query})
+    count, query = filtered_query(type_, request)
+    return jsonify({'results': query, 'count': count})
 
 
 @api.route('/<slug>/relations', methods=['POST'])
