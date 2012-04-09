@@ -10,7 +10,7 @@ from grano.model.schema import ATTRIBUTE_TYPES_DB
 INVALID_NAMES = ['id', 'current', 'serial', 'title',
     'slug', 'type', 'incoming', 'outgoing', 'target', 'source',
     'target_id', 'source_id', 'network', 'network_id',
-    'created_at']
+    'created_at', 'schema', '_fts']
 
 
 ATTRIBUTE_VALIDATORS = {

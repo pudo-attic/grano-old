@@ -3,7 +3,9 @@ from uuid import uuid4
 from time import time
 from unidecode import unidecode
 from json import dumps, loads
-from sqlalchemy.types import Text, MutableType, TypeDecorator
+from sqlalchemy import sql
+from sqlalchemy.types import Text, MutableType, TypeDecorator, \
+    UserDefinedType
 
 SLUG_RE = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
@@ -25,6 +27,22 @@ def make_id():
 
 def make_serial():
     return int(time() * 1000)
+
+
+class TSVector(UserDefinedType):
+    """Support for PostgreSQL full-text search."""
+
+    def get_col_spec(self):
+        from grano.core import db
+        if db.engine.dialect.name == 'postgresql':
+            return 'tsvector'
+        return 'text'
+
+    @classmethod
+    def make_text(cls, bind, text):
+        if bind.engine.dialect.name == 'postgresql':
+            return sql.select([sql.func.to_tsvector(text)], bind=bind).scalar()
+        return text
 
 
 class JSONType(MutableType, TypeDecorator):

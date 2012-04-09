@@ -49,10 +49,16 @@ def make_types(network):
         created_at = db.Column(db.DateTime, default=datetime.utcnow)
         slug = db.Column(db.Unicode)
         title = db.Column(db.Unicode)
+        _fts = db.Column(util.TSVector)
 
         def update_values(self, schema, data):
             self.title = data.get('title')
             self.slug = util.slugify(self.title)
+
+            text = self.title
+            for attribute in schema.attributes:
+                text += ' ' + unicode(getattr(self, attribute.name) or '')
+            self._fts = util.TSVector.make_text(db.engine, text)
 
         def delete(self, schema):
             super(Entity, self).delete(schema)

@@ -11,9 +11,14 @@ def split_fields(field):
     return (key, value)
 
 
-def filtered_query(type_, request):
+def filtered_query(type_, request, fts=False):
     query = type_.all()
     try:
+        if fts:
+            q = request.args.get('q', '').strip()
+            if len(q):
+                query = query.filter('_fts @@ to_tsquery(:q)')
+                query = query.params(q=q)
         filter_ = [split_fields(f) for f in request.args.getlist('filter')]
         for key, values in groupby(filter_, lambda a: a[0]):
             attr = getattr(type_, key)
