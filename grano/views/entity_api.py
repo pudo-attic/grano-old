@@ -30,6 +30,7 @@ def _get_entity(slug, id):
 def _deep_create(data, entity, network):
     for direction, attribute, local in (('incoming', 'source', 'target'),
                                         ('outgoing', 'target', 'source')):
+        keep_relations = []
         for rdata in data.get(direction, []):
             rdata[local] = entity
             odata = rdata.get(attribute)
@@ -48,6 +49,10 @@ def _deep_create(data, entity, network):
                 relation.update(schema, rdata)
             else:
                 relation = network.Relation.create(schema, rdata)
+            keep_relations.append(relation.id)
+        for rel in getattr(entity, direction):
+            if rel.id not in keep_relations:
+                rel.delete(network.get_relation_schema(rel.type))
 
 
 @api.route('/<slug>/entities', methods=['GET', 'OPTIONS'])
