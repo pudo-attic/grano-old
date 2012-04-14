@@ -1,9 +1,12 @@
 from flask import Response, request
 from colander import Invalid
+from hashlib import sha1
 
 from grano.model import Account
 from grano.core import app, current_user, login_manager
 from grano.util import response_format, jsonify, login_user
+from grano.util import validate_cache, NotModified
+from grano.exc import Unauthorized
 from grano import auth
 from grano.views import *
 
@@ -18,6 +21,33 @@ def set_template_context():
 @login_manager.user_loader
 def load_account(name):
     return Account.by_name(name)
+
+
+@app.after_request
+def configure_caching(response_class):
+    if request.method != 'GET' or response_class.status_code > 399:
+        return response_class
+    try:
+        etag, mod_time = validate_cache(request)
+    except NotModified:
+        return Response(status=304)
+    response_class.add_etag(etag)
+    response_class.cache_control.max_age = 84600
+    if current_user.is_anonymous():
+        response_class.cache_control.public = True
+    else:
+        response_class.cache_control.private = True
+    if mod_time:
+        response_class.last_modified = mod_time
+    return response_class
+
+
+@app.before_request
+def setup_cache():
+    args = request.args.items()
+    args = filter(lambda (k,v): k != '_', args) # haha jquery where is your god now?!?
+    query = sha1(repr(sorted(args))).hexdigest()
+    request.cache_key = {'query': query}
 
 
 @app.before_request
@@ -60,6 +90,11 @@ def handle_validation_error(exc):
         return jsonify(body, status=400)
     return Response(repr(exc.asdict()), status=400,
                     mimetype='text/plain')
+
+
+@app.errorhandler(NotModified)
+def handle_not_modified(exc):
+    return Response(status=304)
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from grano.validation import validate_relation, ValidationContext
 from grano.views.network_api import _get_network
 from grano.views.common import filtered_query
 from grano.util import request_content, jsonify, crossdomain
+from grano.util import validate_cache
 from grano.exc import Gone, NotFound, BadRequest
 from grano.auth import require
 
@@ -24,6 +25,9 @@ def _get_relation(slug, id):
     if relation is None:
         raise NotFound('No such entity: %s' % id)
     require.relation.read(network, relation)
+    request.cache_key['modified'] = relation.created_at
+    request.cache_key['id'] = id
+    validate_cache(request)
     return network, relation
 
 
@@ -36,7 +40,10 @@ def index(slug):
     type_name = request.args.get('type', None)
     type_ = _get_schema(network, type_name).cls if type_name else network.Relation
     count, query = filtered_query(type_, request)
-    return jsonify({'results': query, 'count': count})
+    data = {'results': query.all(), 'count': count}
+    request.cache_key['ids'] = [r.id for r in data['results']]
+    request.cache_key['count'] = data['count']
+    return jsonify(data)
 
 
 @api.route('/<slug>/relations', methods=['POST'])

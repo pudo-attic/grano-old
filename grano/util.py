@@ -3,9 +3,11 @@ from dateutil import tz
 import json
 from datetime import timedelta
 from functools import update_wrapper
+from hashlib import sha1
 
 from sqlalchemy.orm.query import Query
 from werkzeug.exceptions import NotFound
+from werkzeug.http import is_resource_modified
 from formencode import htmlfill
 #from formencode.variabledecode import NestedVariables
 from flask import Response, request, current_app, make_response
@@ -115,6 +117,22 @@ def error_fill(page, values, errors):
                 lambda m: "<p class='error-message'>%s</p>" % m,
             prefix_error=False,
             force_defaults=False)
+
+
+class NotModified(Exception):
+    pass
+
+
+def validate_cache(request):
+    etag = sha1(repr(sorted(request.cache_key.items()))).hexdigest()
+    mod_time = request.cache_key.get('modified')
+    if request.method != 'GET':
+        return etag, mod_time
+    if not is_resource_modified(request.environ, etag=etag, last_modified=mod_time):
+        raise NotModified()
+    if request.if_none_match == etag:
+        raise NotModified()
+    return etag, mod_time
 
 
 # from http://flask.pocoo.org/snippets/56/

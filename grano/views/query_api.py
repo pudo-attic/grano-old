@@ -74,10 +74,14 @@ def run(slug, name):
             continue
         row = dict(zip(rp.keys(), row))
         result.append(row)
-    return jsonify({
+    data = {
             'results': result,
             'count': rp.rowcount,
-            'query': query})
+            'query': query}
+    request.cache_key['res'] = \
+        [sorted(r.values()) for r in data['results']]
+    request.cache_key['count'] = data['count']
+    return jsonify(data)
 
 
 @api.route('/<slug>/queries/<name>', methods=['PUT'])
