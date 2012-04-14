@@ -160,6 +160,10 @@ def graph(slug, id):
         #print [line]
         out += line
 
+    # JSONP for XML. Will now go vomit quietly somewhere. 
+    if request.args.get('wrap') == 'json':
+        return jsonify({'xml': out})
+
     return Response(out, status=200,
         content_type='text/xml')
 
