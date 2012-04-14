@@ -2,6 +2,7 @@ import re
 from uuid import uuid4
 from time import time
 from unidecode import unidecode
+from datetime import datetime
 from json import dumps, loads
 from sqlalchemy import sql
 from sqlalchemy.types import Text, MutableType, TypeDecorator, \
@@ -27,6 +28,19 @@ def make_id():
 
 def make_serial():
     return int(time() * 1000)
+
+
+def graph_values(d):
+    for k, v in d.items():
+        if k == 'type':
+            d['_type'] = d['type']
+        if v is None or k == 'type':
+            del d[k]
+        elif isinstance(v, datetime):
+            d[k] = v.isoformat()
+        else:
+            d[k] = unicode(v)
+    return d
 
 
 class TSVector(UserDefinedType):

@@ -91,8 +91,8 @@ def make_types(network):
             return data
 
         def as_nx(self, graph):
-            return graph.add_node(self.id, type=self.type,
-                title=self.title)
+            d = util.graph_values(self.as_dict())
+            return graph.add_node(self.id, **d)
 
         def __repr__(self):
             return "<Entity:%s(%s,%s)>" % (self.type, self.id, self.slug)
@@ -138,8 +138,8 @@ def make_types(network):
             return data
 
         def as_nx(self, graph):
-            return graph.add_edge(self.source_id, self.target_id,
-                id=self.id, type=self.type)
+            d = util.graph_values(self.as_dict())
+            return graph.add_edge(self.source_id, self.target_id, **d)
 
         def __repr__(self):
             return "<Relation:%s(%s,%s,%s)>" % (self.type, self.id,

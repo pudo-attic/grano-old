@@ -1,4 +1,6 @@
-from flask import Blueprint, request, url_for
+from flask import Blueprint, Response, request, url_for
+
+import networkx as nx
 
 from grano.core import db
 from grano.validation import validate_entity, ValidationContext
@@ -67,6 +69,18 @@ def index(slug):
     return jsonify({'results': query, 'count': count})
 
 
+#@api.route('/<slug>/entities/facets', methods=['GET', 'OPTIONS'])
+#@crossdomain(origin='*')
+#def facets(slug):
+#    """ List all available entities. """
+#    network = _get_network(slug)
+#    require.entity.list(network)
+#    type_name = request.args.get('type', None)
+#    type_ = _get_schema(network, type_name).cls if type_name else network.Entity
+#    count, query = filtered_query(type_, request, fts=True)
+#    return jsonify({'results': query, 'count': count})
+
+
 @api.route('/<slug>/entities', methods=['POST'])
 def create(slug):
     """ Create a new entity. """
@@ -106,6 +120,48 @@ def history(slug, id):
     """ Get a JSON representation of the entity's revision history. """
     network, entity = _get_entity(slug, id)
     return jsonify(entity.history)
+
+
+@api.route('/<slug>/entities/<id>/graph', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
+def graph(slug, id):
+    """ Get a JSON representation of the network. """
+    network, entity = _get_entity(slug, id)
+    entity_types = request.args.getlist('entity_type')
+    rel_types = request.args.getlist('relation_type')
+    exports = set()
+    graph = nx.DiGraph()
+
+    def export(entity, depth):
+        if entity.id in exports or \
+            (len(entity_types) and entity.type not in entity_types):
+            return False
+        entity.as_nx(graph)
+        exports.add(entity.id)
+        if depth > 0:
+            for rel in entity.incoming:
+                if len(rel_types) and not rel.type in rel_types:
+                    continue
+                if rel.id not in exports and export(rel.source, depth - 1):
+                    rel.as_nx(graph)
+                    exports.add(rel.id)
+            for rel in entity.outgoing:
+                if len(rel_types) and not rel.type in rel_types:
+                    continue
+                if rel.id not in exports and export(rel.target, depth - 1):
+                    rel.as_nx(graph)
+                    exports.add(rel.id)
+        return True
+
+    export(entity, 2)
+
+    out = ''
+    for line in nx.generate_gexf(graph):
+        #print [line]
+        out += line
+
+    return Response(out, status=200,
+        content_type='text/xml')
 
 
 @api.route('/<slug>/entities/<id>', methods=['PUT'])
