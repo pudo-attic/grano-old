@@ -32,9 +32,10 @@ def configure_caching(response_class):
     except NotModified:
         return Response(status=304)
     response_class.add_etag(etag)
-    response_class.cache_control.max_age = 84600
+    response_class.cache_control.max_age = 21600
     if current_user.is_anonymous():
         response_class.cache_control.public = True
+        response_class.headers.remove('Set-Cookie')
     else:
         response_class.cache_control.private = True
     if mod_time:
