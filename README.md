@@ -70,6 +70,12 @@ $ cp grano/default_settings.py settings.py
 # edit the file to have a working DB connection string etc.
 $ export GRANO_SETTINGS=settings.py
 
+# Install your Database Backend (If needed)
+$ pip install psycopg2
+
+# Create the Database
+$ python grano/manage.py createdb
+
 # Finally, run Grano:
 $ python grano/web.py 
 
