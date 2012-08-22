@@ -30,7 +30,8 @@ setup(
         'sqlalchemy-migrate==0.7.2',
         'python-dateutil==2.0',
         'flask-login==0.1',
-        'formencode==1.2.4'
+        'formencode==1.2.4',
+        'networkx==1.7',
     ],
     tests_require=[],
     entry_points=\
